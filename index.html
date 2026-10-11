@@ -1,0 +1,1762 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Newtonar | Mecânica no quadro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --board:#141414; --board2:#1C1C1C;
+  --ink:#EEEFE8; --muted:#A3B0A8; --rule:rgba(238,239,232,.2);
+  --apple:#F2907F; --leaf:#A9DD9A; --brass:#F3D878; --sky:#92CBEF; --weight:#C9BAF3;
+  --ground:rgba(238,239,232,.07); --sheet:#1C1C1C; --paper:transparent;
+  --bodyA:rgba(238,239,232,.10); --bodyB:rgba(243,216,120,.16);
+  --wood:#6E4B2F;
+  --sans:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --hand:"Kalam", "Comic Sans MS", cursive;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:dark;
+}
+:root{--c:238,239,232;--pick:rgba(243,216,120,.07);--glow:0 0 1px rgba(255,255,255,.5),0 0 8px rgba(255,255,255,.08);--chalk1:#F2F1EA;--wood2:#563A23}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){ --board:#141414; } }
+:root[data-theme="dark"]{ --board:#141414; }
+:root[data-theme="light"]{
+  color-scheme:light;
+  --board:#F3F4F5; --board2:#FFFFFF; --c:26,26,26;
+  --ink:#1A1A1A; --muted:#5E6369; --rule:rgba(26,26,26,.2);
+  --apple:#C8352B; --leaf:#2E7D4A; --brass:#A9740C; --sky:#1F5FA8; --weight:#6A4BB5;
+  --ground:rgba(26,26,26,.06); --sheet:#FFFFFF;
+  --bodyA:rgba(26,26,26,.06); --bodyB:rgba(169,116,12,.14);
+  --pick:rgba(169,116,12,.08); --glow:none;
+  --wood:#B7BCC2; --wood2:#9AA0A7; --chalk1:#1F5FA8;
+}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none !important}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--board)}
+body{
+  margin:0;min-height:100vh;color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(ellipse 60% 40% at 18% 22%, rgba(var(--c),.035), transparent 70%),
+    radial-gradient(ellipse 50% 35% at 82% 68%, rgba(var(--c),.035), transparent 70%),
+    radial-gradient(ellipse 40% 30% at 50% 100%, rgba(var(--c),.03), transparent 70%),
+    var(--board);
+  background-attachment:fixed;
+}
+a{color:var(--sky)}
+:focus-visible{outline:2px dashed var(--brass);outline-offset:3px}
+button{font:inherit;color:inherit}
+
+#ghost{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+#ghost{color:var(--ink)}
+#ghost span{position:absolute;font-family:var(--hand);color:var(--ink);white-space:nowrap;opacity:var(--o,.08);transform:rotate(var(--r,0deg));animation:drift var(--d,18s) ease-in-out infinite alternate}
+#ghost svg{position:absolute;opacity:.07;animation:drift 22s ease-in-out infinite alternate}
+@keyframes drift{from{translate:0 0}to{translate:var(--dx,10px) var(--dy,-16px)}}
+@media (prefers-reduced-motion:reduce){ #ghost span,#ghost svg{animation:none} }
+.wrap{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:0 20px}
+
+/* cabeçalho */
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:28px 0 6px}
+h1{font-family:var(--hand);font-weight:700;font-size:clamp(3rem,9vw,4.8rem);line-height:.9;margin:0;letter-spacing:.01em;text-shadow:var(--glow)}
+.sub{font-family:var(--hand);font-size:1.15rem;color:var(--muted);margin:.4rem 0 0}
+.credit{font-size:.82rem;color:var(--muted);margin:.25rem 0 0}
+.gsel{display:flex;gap:6px;flex-shrink:0;margin-top:8px}
+.gsel button{background:none;border:1.5px solid var(--rule);border-radius:20px;padding:3px 12px;cursor:pointer;font-family:var(--hand);font-size:1rem;color:var(--muted)}
+.gsel button[aria-pressed="true"]{border-color:var(--ink);color:var(--ink)}
+
+/* etapas */
+.step{margin-top:40px}
+.step.in{animation:chalk .4s ease-out}
+@keyframes chalk{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.st{display:flex;align-items:center;gap:12px;font-family:var(--hand);font-weight:400;font-size:1.55rem;margin:0 0 14px;line-height:1.2}
+.st i{font-style:normal;flex:0 0 auto;width:34px;height:34px;border:2px solid var(--brass);border-radius:52% 48% 50% 46%;display:grid;place-items:center;color:var(--brass);font-size:1.1rem;font-weight:700}
+
+.areas{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:10px}
+.area,.card,.bbtn{position:relative;text-align:left;background:rgba(var(--c),.04);border:1.5px solid rgba(var(--c),.32);border-radius:10px;cursor:pointer;color:var(--ink);transition:background .15s,border-color .15s,transform .1s,box-shadow .15s;box-shadow:0 2px 0 rgba(var(--c),.18)}
+.area:hover,.card:hover,.bbtn:hover{border-color:rgba(var(--c),.7);background:rgba(var(--c),.08)}
+.area:active,.card:active,.bbtn:active{transform:translateY(2px);box-shadow:0 0 0 rgba(var(--c),.18)}
+.area[aria-pressed="true"],.card[aria-pressed="true"],.bbtn[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--board);box-shadow:0 2px 0 var(--brass)}
+.area{padding:10px 14px}
+.area b{display:block;font-family:var(--hand);font-weight:700;font-size:1.3rem;line-height:1.2}
+.area small{display:block;font-size:.78rem;color:var(--muted);line-height:1.3;margin-top:2px}
+.area[aria-pressed="true"] small,.card[aria-pressed="true"] span{color:var(--board);opacity:.75}
+
+.topics{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.card{padding:9px 14px 10px}
+.card b{display:block;font-family:var(--hand);font-size:1.15rem;font-weight:700;line-height:1.2}
+.card span{display:block;font-size:.8rem;color:var(--muted);line-height:1.35;margin-top:2px}
+
+.brow{margin-bottom:16px}
+.brow.in{animation:chalk .35s ease-out}
+.blab{font-family:var(--hand);font-size:1.15rem;margin-bottom:8px;color:var(--muted)}
+.bodies{display:flex;flex-wrap:wrap;gap:10px}
+.bbtn{width:90px;padding:7px 2px 6px;text-align:center;font-family:var(--hand);font-size:1rem;line-height:1.1}
+.bbtn canvas{display:block;margin:0 auto 3px;width:72px;height:42px}
+.bbtn[aria-pressed="true"]{background:rgba(var(--c),.12);border-color:var(--brass);color:var(--ink);box-shadow:0 2px 0 var(--brass)}
+
+.gfield{grid-column:1 / -1;display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+.gfield > span{font-size:.88rem;color:var(--muted);margin-right:4px}
+.gopt{background:rgba(var(--c),.04);border:1.5px solid rgba(var(--c),.32);border-radius:10px;padding:4px 14px;cursor:pointer;font:500 1rem var(--mono);color:var(--ink);box-shadow:0 2px 0 rgba(var(--c),.18)}
+.gopt:hover{border-color:rgba(var(--c),.7)}
+.gopt[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--board);box-shadow:0 2px 0 var(--brass)}
+.gfield .inp{width:150px}
+.fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px 30px}
+.fld{display:flex;flex-direction:column;gap:2px}
+.fld > span{font-size:.88rem;color:var(--muted)}
+.inp{display:flex;align-items:baseline;gap:8px;border-bottom:2px solid rgba(var(--c),.35)}
+.inp:focus-within{border-bottom-color:var(--brass)}
+.inp input{flex:1;min-width:0;background:none;border:0;outline:none;color:var(--ink);font:500 1.15rem var(--mono);padding:4px 0}
+.inp em{font-style:normal;font-family:var(--hand);color:var(--muted);font-size:1.05rem}
+.fld select{background:var(--board2);color:var(--ink);border:0;border-bottom:2px solid rgba(var(--c),.35);font:inherit;font-size:1rem;padding:6px 2px;outline:none}
+.hint{font-size:.78rem;color:var(--muted);font-style:italic}
+.chalkbtn{margin-top:22px;background:rgba(var(--c),.04);border:2px solid var(--ink);border-radius:10px;box-shadow:0 2px 0 rgba(var(--c),.25);padding:6px 24px;font-family:var(--hand);font-size:1.3rem;font-weight:700;cursor:pointer}
+.chalkbtn:hover{background:rgba(var(--c),.1)}
+.chalkbtn:active{transform:translateY(2px);box-shadow:none}
+#solve{background:var(--ink);color:var(--board)}
+.chalkbtn.small{margin:0;font-size:1.05rem;padding:3px 16px;border-width:1.5px}
+.chalkbtn.go{border-color:var(--brass);color:var(--brass)}
+
+/* resolução */
+.rhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:12px}
+.rhead h3{margin:0;font-family:var(--hand);font-size:1.9rem;font-weight:700;line-height:1.1}
+.law{font-family:var(--hand);font-size:.95rem;color:var(--apple);border:1.5px solid var(--apple);border-radius:14px;padding:0 10px;cursor:help}
+.board{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:26px;align-items:start}
+.frame{border:1.5px solid var(--rule);border-radius:12px;overflow:hidden}
+.frame canvas{display:block;width:100%}
+.simbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 14px;border-top:1.5px dashed var(--rule)}
+.scale-note{font-size:.75rem;color:var(--muted);margin-left:auto;font-style:italic}
+#live{font-family:var(--mono);font-size:.84rem;padding:8px 14px;border-top:1.5px dashed var(--rule);display:flex;gap:4px 18px;flex-wrap:wrap;color:var(--muted)}
+#live b{font-weight:500;color:var(--ink)}
+.ebar{display:grid;grid-template-columns:28px 1fr 104px;gap:8px;align-items:center;width:100%;font-size:.8rem}
+.ebar i{display:block;height:8px;border-radius:3px;opacity:.85}
+
+.sec{font-family:var(--hand);font-size:1.35rem;color:var(--brass);margin:0 0 8px}
+.rrow{display:flex;align-items:baseline;gap:6px;margin:5px 0;font-size:.93rem}
+.rrow .lbl{color:var(--muted)}
+.rrow .dots{flex:1;border-bottom:2px dotted rgba(var(--c),.2);min-width:12px;transform:translateY(-4px)}
+.rrow .val{font-family:var(--mono);white-space:nowrap}
+.rrow.key .lbl{color:var(--ink)}
+.rrow.key .val{font-family:var(--hand);font-size:1.45rem;font-weight:700;color:var(--brass);line-height:1}
+.err{color:var(--apple);font-family:var(--hand);font-size:1.2rem;margin:0}
+
+.passos{margin-top:34px;max-width:780px}
+.passos ol{list-style:none;counter-reset:p;margin:0;padding:0}
+.passos li{counter-increment:p;position:relative;padding-left:44px;margin-bottom:16px}
+.passos li::before{content:counter(p);position:absolute;left:0;top:-2px;width:30px;height:30px;border:1.5px solid rgba(var(--c),.55);border-radius:50% 46% 52% 48%;display:grid;place-items:center;font-family:var(--hand);font-weight:700}
+.eq{font-family:var(--mono);font-size:.92rem;margin-top:5px;padding:2px 0 2px 12px;border-left:2px solid rgba(var(--c),.3);overflow-x:auto;white-space:nowrap}
+.note{font-family:var(--hand);font-size:1.12rem;color:var(--sky);margin:6px 0 0;line-height:1.4}
+.enun{margin-top:30px;max-width:780px;border:1.5px dashed var(--rule);border-radius:12px;padding:14px 18px}
+.enun p{margin:0 0 12px;font-size:.98rem}
+
+footer{position:relative;z-index:1;margin-top:60px}
+.ledge{height:14px;background:linear-gradient(var(--wood),var(--wood2));box-shadow:0 -2px 0 rgba(0,0,0,.25) inset;position:relative}
+.ledge::before{content:"";position:absolute;left:12%;top:-5px;width:46px;height:8px;border-radius:3px;background:var(--chalk1);opacity:.9}
+.ledge::after{content:"";position:absolute;left:calc(12% + 60px);top:-4px;width:22px;height:7px;border-radius:3px;background:var(--brass);opacity:.8}
+.foot{max-width:1000px;margin:0 auto;padding:14px 20px 28px;font-size:.8rem;color:var(--muted)}
+.foot p{margin:.2rem 0}
+
+@media (max-width:820px){ .board{grid-template-columns:1fr} }
+@media (max-width:520px){
+  header{flex-direction:column}
+  .gsel{margin-top:0}
+  .areas{grid-template-columns:1fr 1fr}
+  .area b{font-size:1.15rem}
+  .bbtn{width:76px}
+  .bbtn canvas{width:64px;height:38px}
+}
+@media (prefers-reduced-motion:reduce){ .step.in,.brow.in{animation:none} }
+#theme{background:none;border:1.5px solid rgba(var(--c),.3);border-radius:20px;padding:3px 12px;cursor:pointer;font-family:var(--hand);font-size:1rem;color:var(--ink)}
+</style>
+</head>
+<body>
+<div id="ghost" aria-hidden="true"></div>
+<div class="wrap">
+<header>
+  <div>
+    <h1>Newtonar</h1>
+    <p class="sub">uma ferramenta de ensino de Mecânica e das Leis de Newton</p>
+    <p class="credit">Criado por: Prof. Me. Rodrigo Gonçalves (Prof Oswy) | <a href="https://youtube.com/@ProfOswy" target="_blank" rel="noopener">youtube.com/@ProfOswy</a></p>
+  </div>
+  <div class="gsel">
+    <button type="button" id="theme">Quadro branco</button>
+  </div>
+</header>
+
+<section class="step" id="s1">
+  <h2 class="st"><i>1</i>O que vamos estudar?</h2>
+  <div class="areas" id="areas"></div>
+</section>
+
+<section class="step" id="s2" hidden>
+  <h2 class="st"><i>2</i>Qual situação?</h2>
+  <div class="topics" id="topics"></div>
+</section>
+
+<section class="step" id="s3" hidden>
+  <h2 class="st"><i>3</i><span id="s3t">Escolha o corpo</span></h2>
+  <div id="bodies"></div>
+</section>
+
+<section class="step" id="s4" hidden>
+  <h2 class="st"><i>4</i>Dados do problema</h2>
+  <div class="fields" id="fields"></div>
+  <button type="button" class="chalkbtn" id="solve">Resolver no quadro</button>
+</section>
+
+<section class="step" id="s5" hidden>
+  <h2 class="st"><i>5</i>Resolução</h2>
+  <div class="rhead"><h3 id="tTitle"></h3><span id="tLaws"></span></div>
+  <div class="board">
+    <div class="frame">
+      <canvas id="cv"></canvas>
+      <div id="live" hidden></div>
+      <div class="simbar">
+        <span id="animBtns"><button class="chalkbtn small go" id="go" type="button">Simular</button> <button class="chalkbtn small" id="rs" type="button">Reiniciar</button></span>
+        <span class="scale-note">desenho fora de escala</span>
+      </div>
+    </div>
+    <div>
+      <p class="sec">Resultados</p>
+      <div id="res"></div>
+    </div>
+  </div>
+  <div class="passos">
+    <p class="sec">Passo a passo</p>
+    <ol id="steps"></ol>
+    <div id="notes"></div>
+  </div>
+  <div class="enun">
+    <p class="sec">Enunciado gerado</p>
+    <p id="enun"></p>
+    <button class="chalkbtn small" id="copy" type="button">Copiar enunciado</button>
+  </div>
+</section>
+</div>
+
+<footer>
+  <div class="ledge"></div>
+  <div class="foot">
+    <p>Contato: <a href="https://youtube.com/@ProfOswy" target="_blank" rel="noopener">youtube.com/@ProfOswy</a> | profoswy@gmail.com | Instagram rodrigo.osw</p>
+    <p>Uso livre para fins pessoais, acadêmicos e educacionais, incluindo o compartilhamento do link. Proibidos redistribuição, obras derivadas, remoção de créditos ou uso comercial sem autorização por escrito.</p>
+  </div>
+</footer>
+<script>
+
+(() => {
+/* ================= utilidades ================= */
+let G = 9.81;
+const D2R = Math.PI / 180;
+const $ = id => document.getElementById(id);
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const fmt = (x, d) => (Math.abs(x) < 1e-12 ? 0 : x).toLocaleString('pt-BR', {minimumFractionDigits: d, maximumFractionDigits: d});
+const num = x => (+x).toLocaleString('pt-BR', {maximumFractionDigits: 4});
+function auto(x){
+  if (!isFinite(x)) return '∞';
+  const a = Math.abs(x);
+  if (a < 1e-9) return '0';
+  if (a >= 1e9) return x.toExponential(3).replace('.', ',').replace('e+', ' × 10^');
+  if (a >= 1000) return fmt(x, 0);
+  if (a >= 1) return fmt(x, 2);
+  if (a >= 0.01) return fmt(x, 3);
+  if (a >= 1e-5) return x.toLocaleString('pt-BR', {maximumSignificantDigits: 3});
+  return x.toExponential(2).replace('.', ',').replace('e', ' × 10^');
+}
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+function nice(x){
+  if (!(x > 0)) return 0;
+  const p = Math.pow(10, Math.floor(Math.log10(x)) - 1);
+  return parseFloat((Math.round(x / p) * p).toPrecision(12));
+}
+const parseBR = v => parseFloat(String(v).trim().replace(/\s/g, '').replace(',', '.'));
+const toBR = v => isFinite(v) ? String(parseFloat((+v).toPrecision(10))).replace('.', ',') : '';
+const eq = s => `<div class="eq">${s}</div>`;
+const li = (t, eqs = [], txt = '') => `<li>${t}${eqs.map(eq).join('')}${txt ? '<div>' + txt + '</div>' : ''}</li>`;
+
+const C = {};
+function readColors(){
+  const cs = getComputedStyle(document.documentElement);
+  ['ink','muted','rule','apple','leaf','brass','sky','weight','ground','sheet','paper','bodyA','bodyB'].forEach(k => C[k] = cs.getPropertyValue('--' + k).trim());
+}
+readColors();
+const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", ui-monospace, monospace', HAND = '"Kalam", cursive';
+
+/* ================= corpos ================= */
+// ordem = frequência com que aparecem em exercícios de Mecânica
+const ORDER = ['bloco','particula','esfera','carro','pessoa','vagao','caminhao','bala','canhao'];
+const BODIES = {
+  bloco:    {nome: 'Bloco',     txt: 'um bloco',     m: 10},
+  particula:{nome: 'Partícula', txt: 'uma partícula', m: 2, f: true},
+  esfera:   {nome: 'Esfera',    txt: 'uma esfera',   m: 0.5, f: true},
+  carro:    {nome: 'Carro',     txt: 'um carro',     m: 1000},
+  pessoa:   {nome: 'Pessoa',    txt: 'uma pessoa',   m: 70, f: true},
+  vagao:    {nome: 'Vagão',     txt: 'um vagão de trem', m: 20000},
+  caminhao: {nome: 'Caminhão',  txt: 'um caminhão',  m: 8000},
+  bala:     {nome: 'Projétil',  txt: 'um projétil',  m: 0.02},
+  canhao:   {nome: 'Canhão',    txt: 'um canhão',    m: 800}
+};
+const DIM = {particula:[1,1], bloco:[1,1], esfera:[1,1], carro:[2,.88], pessoa:[.6,1.5], vagao:[3,1.1], caminhao:[2.6,1.25], bala:[.9,.32], canhao:[1.9,1.05]};
+const fitS = (t, mw, mh) => Math.min(mw / DIM[t][0], mh / DIM[t][1], t === 'particula' ? 16 : Infinity);
+
+function rr(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h);
+}
+/* desenha o corpo com origem no centro da base; retorna largura e altura */
+function drawBody(ctx, t, x, y, s, col, face = 1){
+  ctx.save(); ctx.translate(x, y); ctx.scale(face, 1);
+  ctx.lineWidth = clamp(s * 0.05, 1.1, 2); ctx.strokeStyle = C.ink; ctx.fillStyle = col;
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  const circ = (cx, cy, r, fill) => { ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = fill; ctx.fill(); ctx.stroke(); };
+  switch (t){
+    case 'bloco':
+      rr(ctx, -s/2, -s, s, s, 3); ctx.fill(); ctx.stroke();
+      ctx.globalAlpha = .35; rr(ctx, -s*.36, -s*.86, s*.72, s*.72, 2); ctx.stroke(); ctx.globalAlpha = 1;
+      break;
+    case 'particula':
+      circ(0, -s/2, s/2, C.ink);
+      break;
+    case 'esfera':
+      circ(0, -s/2, s/2, col);
+      ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.beginPath(); ctx.arc(-s*.16, -s*.66, s*.1, 0, Math.PI*2); ctx.fill();
+      break;
+    case 'carro':
+      rr(ctx, -s, -s*.58, 2*s, s*.36, s*.1); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-s*.55, -s*.58); ctx.lineTo(-s*.3, -s*.88); ctx.lineTo(s*.35, -s*.88); ctx.lineTo(s*.62, -s*.58); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = C.sheet; ctx.beginPath(); ctx.moveTo(-s*.42, -s*.61); ctx.lineTo(-s*.26, -s*.81); ctx.lineTo(s*.3, -s*.81); ctx.lineTo(s*.47, -s*.61); ctx.closePath(); ctx.fill();
+      circ(-s*.58, -s*.2, s*.2, C.ink); circ(s*.58, -s*.2, s*.2, C.ink);
+      break;
+    case 'pessoa': {
+      const legH = s*.5, bodyH = s*.6, r = s*.17, bw = s*.42;
+      ctx.beginPath(); ctx.moveTo(-bw*.25, 0); ctx.lineTo(-bw*.2, -legH); ctx.moveTo(bw*.25, 0); ctx.lineTo(bw*.2, -legH); ctx.stroke();
+      rr(ctx, -bw/2, -legH - bodyH, bw, bodyH, 4); ctx.fill(); ctx.stroke();
+      circ(0, -legH - bodyH - r - 1, r, C.sheet);
+      ctx.beginPath(); ctx.moveTo(bw/2, -legH - bodyH*.8); ctx.lineTo(bw/2 + s*.16, -legH - bodyH*.3); ctx.stroke();
+      break; }
+    case 'vagao':
+      rr(ctx, -1.5*s, -1.1*s, 3*s, .85*s, s*.08); ctx.fill(); ctx.stroke();
+      for (let i = 0; i < 4; i++){ ctx.fillStyle = C.sheet; ctx.fillRect(-1.25*s + i*.65*s, -.98*s, .45*s, .3*s); ctx.strokeRect(-1.25*s + i*.65*s, -.98*s, .45*s, .3*s); }
+      [-1.15, -.8, .8, 1.15].forEach(k => circ(k*s, -.13*s, .13*s, C.ink));
+      break;
+    case 'caminhao':
+      rr(ctx, -1.3*s, -1.25*s, 1.72*s, s, s*.05); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(.5*s, -.25*s); ctx.lineTo(.5*s, -.92*s); ctx.lineTo(1.0*s, -.92*s); ctx.lineTo(1.3*s, -.6*s); ctx.lineTo(1.3*s, -.25*s); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = C.sheet; ctx.beginPath(); ctx.moveTo(.58*s, -.84*s); ctx.lineTo(.97*s, -.84*s); ctx.lineTo(1.17*s, -.62*s); ctx.lineTo(.58*s, -.62*s); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-1.3*s, -.25*s); ctx.lineTo(1.3*s, -.25*s); ctx.stroke();
+      [-.95, -.5, .9].forEach(k => circ(k*s, -.2*s, .2*s, C.ink));
+      break;
+    case 'bala':
+      ctx.beginPath(); ctx.moveTo(-.45*s, -.32*s); ctx.lineTo(.15*s, -.32*s); ctx.quadraticCurveTo(.45*s, -.16*s, .15*s, 0); ctx.lineTo(-.45*s, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+      break;
+    case 'canhao':
+      ctx.save(); ctx.translate(-.25*s, -.58*s); ctx.rotate(-.18);
+      rr(ctx, -.5*s, -.15*s, 1.45*s, .3*s, .06*s); ctx.fillStyle = col; ctx.fill(); ctx.stroke(); ctx.restore();
+      circ(-.25*s, -.4*s, .4*s, C.sheet);
+      ctx.beginPath(); for (let a = 0; a < Math.PI; a += Math.PI/3){ ctx.moveTo(-.25*s + Math.cos(a)*.38*s, -.4*s + Math.sin(a)*.38*s); ctx.lineTo(-.25*s - Math.cos(a)*.38*s, -.4*s - Math.sin(a)*.38*s); } ctx.stroke();
+      break;
+  }
+  ctx.restore();
+  return {w: DIM[t][0] * s, h: DIM[t][1] * s};
+}
+
+/* ================= desenho ================= */
+function arrow(ctx, x1, y1, x2, y2, color, label, dashed){
+  const len = Math.hypot(x2 - x1, y2 - y1);
+  if (len < 2) return;
+  const ang = Math.atan2(y2 - y1, x2 - x1), hd = Math.min(11, len * .5);
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = dashed ? 2 : 3; ctx.lineCap = 'round';
+  if (dashed) ctx.setLineDash([5, 4]);
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2 - Math.cos(ang)*hd*.7, y2 - Math.sin(ang)*hd*.7); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - hd*Math.cos(ang - .42), y2 - hd*Math.sin(ang - .42));
+  ctx.lineTo(x2 - hd*Math.cos(ang + .42), y2 - hd*Math.sin(ang + .42));
+  ctx.closePath(); ctx.fill();
+  if (label){
+    ctx.font = '700 16px ' + HAND; ctx.textBaseline = 'middle';
+    const c = Math.cos(ang), s = Math.sin(ang);
+    ctx.textAlign = Math.abs(c) < .3 ? 'center' : (c > 0 ? 'left' : 'right');
+    ctx.fillText(label, x2 + c*8, y2 + s*12);
+  }
+}
+function wrapText(ctx, text, x, y, maxW, lh){
+  let line = '';
+  for (const wd of text.split(' ')){
+    const test = line ? line + ' ' + wd : wd;
+    if (ctx.measureText(test).width > maxW && line){ ctx.fillText(line, x, y); line = wd; y += lh; }
+    else line = test;
+  }
+  ctx.fillText(line, x, y);
+}
+function caption(ctx, w, text, maxW){
+  ctx.fillStyle = C.ink; ctx.font = '18px ' + HAND; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  wrapText(ctx, text, 14, 10, maxW || w - 28, 22);
+}
+function label(ctx, text, x, y, col){
+  ctx.fillStyle = col || C.ink; ctx.font = '700 16px ' + HAND; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.fillText(text, x, y);
+}
+function floor(ctx, w, h, gy, tint, alpha){
+  ctx.fillStyle = C.ground; ctx.fillRect(0, gy, w, h - gy);
+  if (tint){ ctx.globalAlpha = alpha; ctx.fillStyle = tint; ctx.fillRect(0, gy, w, h - gy); ctx.globalAlpha = 1; }
+  ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
+}
+function niceStep(scale){
+  for (const v of [.5,1,2,5,10,20,50,100,200,500,1000,2000,5000]) if (v * scale >= 26) return v;
+  return 10000;
+}
+/* chão com régua; tela x = x0 + (m - camX)*scale */
+function ruler(ctx, w, h, gy, camX, scale, x0, absLabels, signed){
+  const step = niceStep(scale), lab = Math.max(1, Math.ceil(58 / (step * scale)));
+  ctx.font = '11px ' + MONO; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.lineWidth = 1;
+  const a = camX - x0 / scale, b = camX + (w - x0) / scale;
+  for (let i = Math.floor(a / step); i * step <= b + step; i++){
+    const m = i * step;
+    if (m < 0 && !absLabels && !signed) continue;
+    const sx = x0 + (m - camX) * scale, big = i % lab === 0;
+    ctx.strokeStyle = C.muted; ctx.beginPath(); ctx.moveTo(sx, gy); ctx.lineTo(sx, gy + (big ? 9 : 5)); ctx.stroke();
+    if (big){ const v = signed ? m : Math.abs(m); ctx.fillStyle = C.muted; ctx.fillText(num(v) + ' m', sx, gy + 12); }
+  }
+}
+const forceLen = (h, max) => { const k = Math.min(80, h * .2) / Math.max(max, 1e-9); return f => f > 1e-9 ? Math.max(14, f * k) : 0; };
+
+/* ================= assuntos ================= */
+const LAWS = {
+  '1ª Lei': 'Inércia: sem força resultante, o corpo mantém repouso ou movimento retilíneo uniforme.',
+  '2ª Lei': 'Princípio fundamental: FR = m·a.',
+  '3ª Lei': 'Ação e reação: forças de mesma intensidade e sentidos opostos, em corpos diferentes.'
+};
+const NO_PROJ = ['bloco','particula','esfera','carro','pessoa','vagao','caminhao'];
+const body = (s, k) => BODIES[s['b' + k]];
+const o = (s, k) => body(s, k).f ? 'a' : 'o';
+const mtxt = (s, k) => `${body(s, k).txt} de massa ${num(s['m' + k])} kg`;
+
+const TOPICS = [
+/* ---------- DINÂMICA ---------- */
+{
+  id: 'resultante', grupo: 'Dinâmica', nome: 'Força resultante e atrito',
+  desc: 'Um corpo em repouso numa superfície horizontal recebe uma força. Calcula atrito, resultante, aceleração e velocidade.',
+  leis: ['1ª Lei', '2ª Lei'], bodies: 1, bodyLabels: ['Corpo'], def: ['bloco'], allow: NO_PROJ,
+  inputs: [
+    {id: 'F', label: 'Força aplicada F', unit: 'N', min: 0},
+    {id: 'mu', label: 'Coeficiente de atrito μ', unit: '', min: 0, max: 2, val: 0.2},
+    {id: 't', label: 'Tempo de aplicação t', unit: 's', min: 0, val: 5}
+  ],
+  defaults: s => { s.F = nice(0.5 * s.m1 * G); },
+  compute: s => {
+    const m = s.m1, P = m * G, N = P, Fmax = s.mu * N, moves = s.F > Fmax + 1e-9;
+    const Fat = moves ? Fmax : s.F, Fr = moves ? s.F - Fmax : 0, a = Fr / m;
+    return {P, N, Fmax, moves, Fat, Fr, a, v: a * s.t, d: a * s.t * s.t / 2};
+  },
+  results: (s, R) => [['Força de atrito', auto(R.Fat), 'N'], ['Força resultante', auto(R.Fr), 'N'], ['Aceleração', auto(R.a), 'm/s²', 1], ['Velocidade após t', auto(R.v), 'm/s', 1], ['Distância após t', auto(R.d), 'm']],
+  steps: (s, R) => {
+    let h = li('Peso:', [`P = m·g = ${num(s.m1)} × ${num(G)} = ${auto(R.P)} N`])
+      + li('Normal (piso horizontal, sem forças verticais extras):', [`N = P = ${auto(R.N)} N`])
+      + li('Atrito estático máximo:', [`Fat,máx = μ·N = ${num(s.mu)} × ${auto(R.N)} = ${auto(R.Fmax)} N`])
+      + li('Comparação:', [`F = ${num(s.F)} N ${R.moves ? '>' : '≤'} Fat,máx = ${auto(R.Fmax)} N`], R.moves ? 'O corpo entra em movimento; o atrito passa a valer Fat = μ·N.' : `O corpo não se move: o atrito equilibra F (Fat = ${num(s.F)} N). Pela 1ª Lei, continua em repouso.`);
+    if (R.moves) h += li('Força resultante:', [`F<sub>R</sub> = F − Fat = ${num(s.F)} − ${auto(R.Fmax)} = ${auto(R.Fr)} N`])
+      + li('Aceleração (2ª Lei):', [`a = F<sub>R</sub> / m = ${auto(R.Fr)} / ${num(s.m1)} = ${auto(R.a)} m/s²`])
+      + li('Após t, partindo do repouso (MUV):', [`v = a·t = ${auto(R.a)} × ${num(s.t)} = ${auto(R.v)} m/s`, `d = a·t² / 2 = ${auto(R.a)} × ${num(s.t)}² / 2 = ${auto(R.d)} m`]);
+    return h;
+  },
+  notes: 'Peso e normal têm mesma intensidade aqui, mas não são par ação e reação: atuam no mesmo corpo. Para simplificar, o mesmo μ é usado para atrito estático e cinético.',
+  enun: s => `${cap(mtxt(s, 1))} está em repouso sobre uma superfície horizontal com coeficiente de atrito ${num(s.mu)}. Uma força horizontal constante de ${num(s.F)} N é aplicada ao corpo durante ${num(s.t)} s. Considerando g = ${num(G)} m/s², determine: a) a força de atrito; b) a força resultante; c) a aceleração; d) a velocidade ao final desse intervalo.`,
+  draw(ctx, w, h, s, R){
+    const gy = h * .74;
+    floor(ctx, w, h, gy, s.mu > 0 ? C.brass : null, Math.min(.35, s.mu * .4));
+    const x = w * .42, b = drawBody(ctx, s.b1, x, gy, fitS(s.b1, w * .3, h * .3), C.bodyA), cy = gy - b.h / 2;
+    const L = forceLen(h, Math.max(R.P, s.F));
+    arrow(ctx, x, cy, x, cy + L(R.P), C.weight, 'P');
+    arrow(ctx, x, cy, x, cy - L(R.N), C.sky, 'N');
+    arrow(ctx, x + b.w / 2, cy, x + b.w / 2 + L(s.F), cy, C.apple, 'F');
+    arrow(ctx, x - b.w / 2, gy - 5, x - b.w / 2 - L(R.Fat), gy - 5, C.brass, 'Fat');
+    caption(ctx, w, R.moves ? `Resultante para a direita: a = ${auto(R.a)} m/s².` : 'F não vence o atrito máximo: o corpo fica parado.');
+  }
+},
+{
+  id: 'plano', grupo: 'Dinâmica', nome: 'Plano inclinado',
+  desc: 'Corpo apoiado numa rampa. Decompõe o peso, verifica se desliza e calcula aceleração, velocidade e tempo de descida.',
+  leis: ['1ª Lei', '2ª Lei'], bodies: 1, bodyLabels: ['Corpo'], def: ['bloco'], allow: ['bloco','particula','carro','pessoa','caminhao','vagao'],
+  inputs: [
+    {id: 'ang', label: 'Ângulo da rampa θ', unit: '°', min: 0, max: 89, val: 30},
+    {id: 'mu', label: 'Coeficiente de atrito μ', unit: '', min: 0, max: 2, val: 0.2},
+    {id: 'L', label: 'Comprimento da rampa', unit: 'm', min: 0, val: 5}
+  ],
+  compute: s => {
+    const th = s.ang * D2R, m = s.m1, P = m * G, Px = P * Math.sin(th), Py = P * Math.cos(th), N = Py, Fmax = s.mu * N;
+    const moves = Px > Fmax + 1e-9, Fat = moves ? Fmax : Px, a = moves ? (Px - Fmax) / m : 0;
+    return {th, P, Px, Py, N, Fmax, moves, Fat, a, v: Math.sqrt(2 * a * s.L), t: a > 0 ? Math.sqrt(2 * s.L / a) : Infinity, crit: Math.atan(s.mu) / D2R};
+  },
+  results: (s, R) => [['Componente Px (ao longo da rampa)', auto(R.Px), 'N'], ['Normal N', auto(R.N), 'N'], ['Força de atrito', auto(R.Fat), 'N'], ['Aceleração', auto(R.a), 'm/s²', 1], ['Velocidade no fim da rampa', R.moves ? auto(R.v) : '0', 'm/s', 1], ['Tempo de descida', R.moves ? auto(R.t) : 'não desce', R.moves ? 's' : ''], ['Ângulo crítico (tg θc = μ)', auto(R.crit), '°']],
+  steps: (s, R) => {
+    let h = li('Peso:', [`P = m·g = ${num(s.m1)} × ${num(G)} = ${auto(R.P)} N`])
+      + li('Decomposição do peso:', [`Px = P·sen θ = ${auto(R.P)} × sen ${num(s.ang)}° = ${auto(R.Px)} N`, `Py = P·cos θ = ${auto(R.P)} × cos ${num(s.ang)}° = ${auto(R.Py)} N`])
+      + li('Normal (equilíbrio perpendicular à rampa):', [`N = Py = ${auto(R.N)} N`])
+      + li('Atrito máximo:', [`Fat,máx = μ·N = ${num(s.mu)} × ${auto(R.N)} = ${auto(R.Fmax)} N`])
+      + li('Comparação:', [`Px = ${auto(R.Px)} N ${R.moves ? '>' : '≤'} Fat,máx = ${auto(R.Fmax)} N`], R.moves ? 'O corpo desliza rampa abaixo.' : 'O corpo fica parado: o atrito equilibra Px.');
+    if (R.moves) h += li('Aceleração (2ª Lei na direção da rampa):', [`a = (Px − Fat) / m = g·(sen θ − μ·cos θ) = ${auto(R.a)} m/s²`])
+      + li('Velocidade no fim da rampa (Torricelli, partindo do repouso):', [`v = √(2·a·L) = √(2 × ${auto(R.a)} × ${num(s.L)}) = ${auto(R.v)} m/s`])
+      + li('Tempo de descida:', [`t = √(2·L / a) = √(2 × ${num(s.L)} / ${auto(R.a)}) = ${auto(R.t)} s`]);
+    h += li('Ângulo crítico (a partir do qual começa a deslizar):', [`tg θc = μ ⇒ θc = arctg ${num(s.mu)} = ${auto(R.crit)}°`]);
+    return h;
+  },
+  notes: 'A massa se cancela na aceleração: a = g·(sen θ − μ·cos θ). Corpos leves e pesados descem do mesmo jeito.',
+  enun: s => `${cap(mtxt(s, 1))} é abandonad${o(s, 1)} no topo de uma rampa de ${num(s.L)} m de comprimento, inclinada de ${num(s.ang)}° em relação à horizontal. O coeficiente de atrito entre o corpo e a rampa é ${num(s.mu)}. Considerando g = ${num(G)} m/s², verifique se o corpo desliza e, em caso afirmativo, determine a aceleração, a velocidade ao final da rampa e o tempo de descida.`,
+  draw(ctx, w, h, s, R){
+    const gy = h * .88, thv = clamp(R.th, 8 * D2R, 62 * D2R);
+    let Bw = w * .72, H = Bw * Math.tan(thv);
+    if (H > h * .64){ H = h * .64; Bw = H / Math.tan(thv); }
+    const xL = (w - Bw) / 2, A = {x: xL, y: gy - H}, Cc = {x: xL + Bw, y: gy};
+    floor(ctx, w, h, gy);
+    ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(xL, gy); ctx.lineTo(Cc.x, Cc.y); ctx.closePath();
+    ctx.fillStyle = C.ground; ctx.fill(); ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.stroke();
+    const len = Math.hypot(Bw, H), ux = {x: Math.cos(thv), y: Math.sin(thv)}, nx = {x: Math.sin(thv), y: -Math.cos(thv)};
+    const p = {x: A.x + ux.x * len * .5, y: A.y + ux.y * len * .5};
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(thv);
+    const b = drawBody(ctx, s.b1, 0, 0, fitS(s.b1, len * .28, h * .2), C.bodyA);
+    ctx.restore();
+    const c = {x: p.x + nx.x * b.h / 2, y: p.y + nx.y * b.h / 2}, L = forceLen(h, R.P);
+    arrow(ctx, c.x, c.y, c.x, c.y + L(R.P), C.weight, 'P');
+    arrow(ctx, c.x, c.y, c.x + nx.x * L(R.N), c.y + nx.y * L(R.N), C.sky, 'N');
+    arrow(ctx, c.x, c.y, c.x + ux.x * L(R.Px), c.y + ux.y * L(R.Px), C.muted, 'Px', true);
+    arrow(ctx, c.x, c.y, c.x - nx.x * L(R.Py), c.y - nx.y * L(R.Py), C.muted, 'Py', true);
+    const q = {x: p.x - ux.x * b.w / 2, y: p.y - ux.y * b.w / 2};
+    arrow(ctx, q.x, q.y, q.x - ux.x * L(R.Fat), q.y - ux.y * L(R.Fat), C.brass, 'Fat');
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(Cc.x, Cc.y, 38, Math.PI, Math.PI + thv); ctx.stroke();
+    ctx.fillStyle = C.ink; ctx.font = '15px ' + HAND; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+    ctx.fillText(`θ = ${num(s.ang)}°`, Cc.x - 44, Cc.y - 4);
+    caption(ctx, w, R.moves ? 'Desliza: Px supera o atrito máximo.' : 'Fica parado: o atrito estático equilibra Px.', w * .5);
+  }
+},
+{
+  id: 'blocos', grupo: 'Dinâmica', nome: 'Corpos ligados por fio',
+  desc: 'Uma força puxa o corpo A, que arrasta o corpo B por um fio ideal. Calcula a aceleração do conjunto e a tração no fio.',
+  leis: ['2ª Lei', '3ª Lei'], bodies: 2, bodyLabels: ['Corpo A (puxado pela força)', 'Corpo B (arrastado pelo fio)'], def: ['bloco', 'bloco'], allow: NO_PROJ,
+  inputs: [
+    {id: 'F', label: 'Força aplicada em A', unit: 'N', min: 0},
+    {id: 'mu', label: 'Coeficiente de atrito μ', unit: '', min: 0, max: 2, val: 0.1, hint: 'Use 0 para superfície sem atrito.'}
+  ],
+  defaults: s => { s.F = nice((s.m1 + s.m2) * 3); },
+  compute: s => {
+    const M = s.m1 + s.m2, FatA = s.mu * s.m1 * G, FatB = s.mu * s.m2 * G, moves = s.F > FatA + FatB + 1e-9;
+    const a = moves ? (s.F - FatA - FatB) / M : 0, T = moves ? s.m2 * a + FatB : NaN;
+    return {M, FatA, FatB, moves, a, T};
+  },
+  results: (s, R) => [['Aceleração do conjunto', auto(R.a), 'm/s²', 1], ['Tração no fio', R.moves ? auto(R.T) : 'indeterminada', R.moves ? 'N' : '', 1], ['Atrito em A', auto(R.moves ? R.FatA : 0), 'N'], ['Atrito em B', auto(R.moves ? R.FatB : 0), 'N']],
+  steps: (s, R) => {
+    let h = li('Atritos (se houver movimento):', [`FatA = μ·mA·g = ${num(s.mu)} × ${num(s.m1)} × ${num(G)} = ${auto(R.FatA)} N`, `FatB = μ·mB·g = ${num(s.mu)} × ${num(s.m2)} × ${num(G)} = ${auto(R.FatB)} N`])
+      + li('Verificação:', [`F = ${num(s.F)} N ${R.moves ? '>' : '≤'} FatA + FatB = ${auto(R.FatA + R.FatB)} N`], R.moves ? 'O conjunto se move.' : 'O conjunto permanece em repouso (1ª Lei).');
+    if (R.moves) h += li('Conjunto como um só corpo (a tração é força interna e se cancela):', [`F − FatA − FatB = (mA + mB)·a`, `a = (${num(s.F)} − ${auto(R.FatA)} − ${auto(R.FatB)}) / ${num(R.M)} = ${auto(R.a)} m/s²`])
+      + li('Isolando o corpo B:', [`T − FatB = mB·a`, `T = ${num(s.m2)} × ${auto(R.a)} + ${auto(R.FatB)} = ${auto(R.T)} N`])
+      + li('Conferência no corpo A:', [`F − T − FatA = ${num(s.F)} − ${auto(R.T)} − ${auto(R.FatA)} = ${auto(s.F - R.T - R.FatA)} N`, `mA·a = ${num(s.m1)} × ${auto(R.a)} = ${auto(s.m1 * R.a)} N ✓`]);
+    return h;
+  },
+  notes: 'O fio puxa A para trás e B para a frente com a mesma tração T: é um par ação e reação transmitido pelo fio.',
+  enun: s => `${cap(mtxt(s, 1))} (corpo A) e ${mtxt(s, 2)} (corpo B) estão ligados por um fio ideal sobre uma superfície horizontal com coeficiente de atrito ${num(s.mu)}. Uma força horizontal de ${num(s.F)} N é aplicada ao corpo A. Considerando g = ${num(G)} m/s², determine a aceleração do conjunto e a tração no fio.`,
+  draw(ctx, w, h, s, R){
+    const gy = h * .74;
+    floor(ctx, w, h, gy, s.mu > 0 ? C.brass : null, Math.min(.35, s.mu * .4));
+    const sB = fitS(s.b2, w * .24, h * .26), sA = fitS(s.b1, w * .24, h * .26);
+    const wB = DIM[s.b2][0] * sB, wA = DIM[s.b1][0] * sA, gap = w * .12;
+    const xB = w * .08 + wB / 2, xA = xB + wB / 2 + gap + wA / 2;
+    const bB = drawBody(ctx, s.b2, xB, gy, sB, C.bodyB), bA = drawBody(ctx, s.b1, xA, gy, sA, C.bodyA);
+    const ry = gy - Math.min(bA.h, bB.h) * .45;
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(xB + wB / 2, ry); ctx.lineTo(xA - wA / 2, ry); ctx.stroke();
+    label(ctx, 'A', xA, gy - bA.h - 6); label(ctx, 'B', xB, gy - bB.h - 6);
+    const L = forceLen(h, Math.max(s.F, R.T || 0));
+    arrow(ctx, xA + wA / 2, gy - bA.h / 2, xA + wA / 2 + L(s.F), gy - bA.h / 2, C.apple, 'F');
+    if (R.moves){
+      const lt = Math.min(L(R.T), gap * .45);
+      arrow(ctx, xA - wA / 2, ry, xA - wA / 2 - lt, ry, C.weight, 'T');
+      arrow(ctx, xB + wB / 2, ry, xB + wB / 2 + lt, ry, C.weight, 'T');
+      if (s.mu > 0){
+        arrow(ctx, xA - wA / 2, gy - 5, xA - wA / 2 - L(R.FatA), gy - 5, C.brass, '');
+        arrow(ctx, xB - wB / 2, gy - 5, xB - wB / 2 - L(R.FatB), gy - 5, C.brass, '');
+      }
+    }
+    caption(ctx, w, R.moves ? `a = ${auto(R.a)} m/s²  |  T = ${auto(R.T)} N` : 'F não supera o atrito total: o conjunto fica parado.');
+  }
+},
+{
+  id: 'frenagem', grupo: 'Dinâmica', nome: 'Inércia e frenagem',
+  desc: 'Um corpo em movimento é freado apenas pelo atrito. Calcula desaceleração, tempo e distância de parada.',
+  leis: ['1ª Lei', '2ª Lei'], bodies: 1, bodyLabels: ['Corpo'], def: ['carro'], allow: NO_PROJ, anim: true,
+  inputs: [
+    {id: 'v0', label: 'Velocidade inicial v₀', unit: 'm/s', min: 0.01, val: 20, hint: 'De km/h para m/s: divida por 3,6 (72 km/h = 20 m/s).'},
+    {id: 'mu', label: 'Coeficiente de atrito μ', unit: '', min: 0, max: 2, val: 0.7}
+  ],
+  compute: s => {
+    const a = s.mu * G, Fat = s.mu * s.m1 * G;
+    return {a, Fat, t: a > 0 ? s.v0 / a : Infinity, d: a > 0 ? s.v0 * s.v0 / (2 * a) : Infinity};
+  },
+  results: (s, R) => [['Velocidade inicial', auto(s.v0 * 3.6), 'km/h'], ['Força de atrito', auto(R.Fat), 'N'], ['Desaceleração', auto(R.a), 'm/s²'], ['Tempo até parar', auto(R.t), 's', 1], ['Distância de frenagem', auto(R.d), 'm', 1]],
+  steps: (s, R) => {
+    let h = li('Conversão da velocidade (se necessário):', [`v₀ = ${num(s.v0)} m/s = ${num(s.v0)} × 3,6 = ${auto(s.v0 * 3.6)} km/h`])
+      + li('Normal e atrito (piso horizontal):', [`N = m·g = ${num(s.m1)} × ${num(G)} = ${auto(s.m1 * G)} N`, `Fat = μ·N = ${num(s.mu)} × ${auto(s.m1 * G)} = ${auto(R.Fat)} N`])
+      + li('Desaceleração (2ª Lei):', [`a = Fat / m = μ·g = ${num(s.mu)} × ${num(G)} = ${auto(R.a)} m/s²`], 'A massa se cancela: a distância de frenagem não depende da massa.');
+    if (R.a > 0) h += li('Tempo até parar:', [`t = v₀ / a = ${num(s.v0)} / ${auto(R.a)} = ${auto(R.t)} s`])
+      + li('Distância de frenagem (Torricelli):', [`d = v₀² / (2·a) = ${num(s.v0)}² / (2 × ${auto(R.a)}) = ${auto(R.d)} m`]);
+    else h += li('Sem atrito:', [`ΣF = 0 ⇒ a = 0 ⇒ v = ${num(s.v0)} m/s constante`], 'Pela 1ª Lei, o corpo nunca para.');
+    return h;
+  },
+  notes: 'Dobrar a velocidade quadruplica a distância de frenagem (d ∝ v²). Os ocupantes de um veículo tendem a seguir em frente na freada (1ª Lei): é a função do cinto de segurança.',
+  enun: s => `${cap(mtxt(s, 1))} desloca-se a ${num(s.v0)} m/s (${auto(s.v0 * 3.6)} km/h) numa superfície horizontal e passa a ser fread${o(s, 1)} apenas pelo atrito, com coeficiente ${num(s.mu)}. Considerando g = ${num(G)} m/s², determine a desaceleração, o tempo até parar e a distância de frenagem.`,
+  sp: (s, R) => isFinite(R.t) ? Math.max(1, R.t / 5) : 1,
+  dur(s, R){ return isFinite(R.t) ? R.t / this.sp(s, R) + .6 : 6; },
+  state(s, R, T){
+    const tt = isFinite(R.t) ? Math.min(T * this.sp(s, R), R.t) : T;
+    return {tt, x: s.v0 * tt - R.a * tt * tt / 2, v: Math.max(0, s.v0 - R.a * tt)};
+  },
+  live(s, R, an){ const q = this.state(s, R, an.t); return `<span>t = <b>${fmt(q.tt, 2)}</b> s</span><span>v = <b>${fmt(q.v, 2)}</b> m/s</span><span>d = <b>${fmt(q.x, 2)}</b> m</span>${this.sp(s, R) > 1 ? `<span>velocidade de exibição ×${fmt(this.sp(s, R), 1)}</span>` : ''}`; },
+  draw(ctx, w, h, s, R, an){
+    const gy = h * .72, sz = fitS(s.b1, w * .2, h * .24), bw = DIM[s.b1][0] * sz, x0 = 16 + bw / 2;
+    const total = isFinite(R.d) ? R.d : s.v0 * 6;
+    const scale = clamp((w - x0 - bw / 2 - 20) / Math.max(total, 4), .05, 60);
+    const q = this.state(s, R, an.t);
+    const camX = isFinite(R.d) ? 0 : Math.max(0, q.x - (w * .5 - x0) / scale);
+    floor(ctx, w, h, gy, s.mu > 0 ? C.brass : null, Math.min(.35, s.mu * .4));
+    ruler(ctx, w, h, gy, camX, scale, x0);
+    if (isFinite(R.d)){
+      const sx = x0 + (R.d - camX) * scale;
+      ctx.setLineDash([5, 5]); ctx.strokeStyle = C.apple; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(sx, gy - h * .45); ctx.lineTo(sx, gy); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = C.apple; ctx.font = '14px ' + HAND; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; ctx.fillText('para aqui', sx - 4, gy - h * .45 + 16);
+    }
+    const px = x0 + (q.x - camX) * scale, b = drawBody(ctx, s.b1, px, gy, sz, C.bodyA);
+    if (q.v > 0){
+      arrow(ctx, px, gy - b.h - 16, px + 14 + 70 * q.v / s.v0, gy - b.h - 16, C.leaf, 'v');
+      if (s.mu > 0) arrow(ctx, px - b.w / 2, gy - 5, px - b.w / 2 - 40, gy - 5, C.brass, 'Fat');
+    }
+    caption(ctx, w, an.t === 0 ? 'Toque em Simular.' : (q.v > 0 ? (s.mu > 0 ? 'Só o atrito atua na horizontal e reduz a velocidade.' : 'Sem atrito: velocidade constante (1ª Lei).') : 'Parou.'), w * .6);
+  }
+},
+/* ---------- MOMENTO LINEAR ---------- */
+{
+  id: 'impulso', grupo: 'Momento linear', nome: 'Impulso e quantidade de movimento',
+  desc: 'Uma força age sobre um corpo durante um intervalo de tempo. Calcula impulso, quantidade de movimento e velocidade final.',
+  leis: ['2ª Lei'], bodies: 1, bodyLabels: ['Corpo'], def: ['esfera'], allow: ORDER,
+  inputs: [
+    {id: 'v0', label: 'Velocidade inicial v₀', unit: 'm/s', val: 0, hint: 'Positivo no sentido da força; negativo no sentido oposto.'},
+    {id: 'F', label: 'Força média F', unit: 'N', min: 0},
+    {id: 'dt', label: 'Tempo de atuação Δt', unit: 's', min: 1e-6}
+  ],
+  defaults: s => { s.dt = s.m1 < 5 ? 0.05 : (s.m1 < 500 ? 0.5 : 5); s.F = nice(s.m1 * 10 / s.dt); },
+  compute: s => { const I = s.F * s.dt, Q0 = s.m1 * s.v0, Qf = Q0 + I; return {I, Q0, Qf, vf: Qf / s.m1, dv: I / s.m1}; },
+  results: (s, R) => [['Impulso I', auto(R.I), 'N·s', 1], ['Quantidade de movimento inicial', auto(R.Q0), 'kg·m/s'], ['Quantidade de movimento final', auto(R.Qf), 'kg·m/s'], ['Variação de velocidade', auto(R.dv), 'm/s'], ['Velocidade final', auto(R.vf), 'm/s', 1]],
+  steps: (s, R) => li('Impulso da força:', [`I = F·Δt = ${num(s.F)} × ${num(s.dt)} = ${auto(R.I)} N·s`])
+    + li('Quantidade de movimento inicial:', [`Q₀ = m·v₀ = ${num(s.m1)} × ${num(s.v0)} = ${auto(R.Q0)} kg·m/s`])
+    + li('Teorema do impulso (forma original da 2ª Lei, F = ΔQ/Δt):', [`I = ΔQ ⇒ Q = Q₀ + I = ${auto(R.Q0)} + ${auto(R.I)} = ${auto(R.Qf)} kg·m/s`])
+    + li('Velocidade final:', [`v = Q / m = ${auto(R.Qf)} / ${num(s.m1)} = ${auto(R.vf)} m/s`]),
+  notes: 'Newton escreveu a 2ª Lei como variação da quantidade de movimento: F = ΔQ/Δt. Para massa constante, isso é o mesmo que F = m·a. Air bags aumentam Δt para reduzir a força num mesmo impulso.',
+  enun: s => `${cap(mtxt(s, 1))} ${s.v0 === 0 ? 'está em repouso' : `move-se a ${num(s.v0)} m/s`} quando recebe, na direção ${s.v0 < 0 ? 'oposta ao movimento' : 'do movimento'}, uma força média de ${num(s.F)} N durante ${num(s.dt)} s. Determine o impulso aplicado e a velocidade final do corpo.`,
+  draw(ctx, w, h, s, R){
+    const gy = h * .76, sz = fitS(s.b1, w * .22, h * .26);
+    floor(ctx, w, h, gy);
+    const x1 = w * .2, x2 = w * .78;
+    ctx.globalAlpha = .4; const b1 = drawBody(ctx, s.b1, x1, gy, sz, C.bodyA); ctx.globalAlpha = 1;
+    const b2 = drawBody(ctx, s.b1, x2, gy, sz, C.bodyA);
+    ctx.fillStyle = C.muted; ctx.font = '15px ' + HAND; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.fillText('antes', x1, gy + 8); ctx.fillText('depois', x2, gy + 8);
+    const vmax = Math.max(Math.abs(s.v0), Math.abs(R.vf), 1e-9), kv = Math.min(80, w * .14) / vmax;
+    const vy1 = gy - b1.h - 16, vy2 = gy - b2.h - 16;
+    if (Math.abs(s.v0) > 1e-9) arrow(ctx, x1, vy1, x1 + s.v0 * kv, vy1, C.leaf, 'v₀'); else label(ctx, 'v₀ = 0', x1, vy1 + 6, C.leaf);
+    if (Math.abs(R.vf) > 1e-9) arrow(ctx, x2, vy2, x2 + R.vf * kv, vy2, C.leaf, 'v'); else label(ctx, 'v = 0', x2, vy2 + 6, C.leaf);
+    const my = gy - Math.max(b1.h, b2.h) / 2;
+    arrow(ctx, x1 + b1.w / 2 + 10, my, x2 - b2.w / 2 - 10, my, C.apple, '');
+    label(ctx, `I = F·Δt = ${auto(R.I)} N·s`, (x1 + x2) / 2, my - 8, C.apple);
+    caption(ctx, w, 'O impulso da força muda a quantidade de movimento do corpo.');
+  }
+},
+{
+  id: 'colisao', grupo: 'Momento linear', nome: 'Colisões',
+  desc: 'Dois corpos colidem frontalmente. Usa conservação da quantidade de movimento e coeficiente de restituição.',
+  leis: ['2ª Lei', '3ª Lei'], bodies: 2, bodyLabels: ['Corpo A (à esquerda)', 'Corpo B (à direita)'], def: ['esfera', 'esfera'], allow: ORDER, anim: true,
+  inputs: [
+    {id: 'v1', label: 'Velocidade de A', unit: 'm/s', val: 4, hint: 'Positivo para a direita, negativo para a esquerda.'},
+    {id: 'v2', label: 'Velocidade de B', unit: 'm/s', val: 0},
+    {id: 'e', label: 'Tipo de colisão', type: 'select', val: 1, options: [[1, 'Elástica (e = 1)'], [0.5, 'Parcialmente elástica (e = 0,5)'], [0, 'Perfeitamente inelástica (e = 0)']]}
+  ],
+  compute: s => {
+    const hit = s.v1 > s.v2 + 1e-9, M = s.m1 + s.m2, Q = s.m1 * s.v1 + s.m2 * s.v2, e = +s.e;
+    const u1 = hit ? (Q - s.m2 * e * (s.v1 - s.v2)) / M : s.v1, u2 = hit ? (Q + s.m1 * e * (s.v1 - s.v2)) / M : s.v2;
+    const Ei = .5 * s.m1 * s.v1 * s.v1 + .5 * s.m2 * s.v2 * s.v2, Ef = .5 * s.m1 * u1 * u1 + .5 * s.m2 * u2 * u2;
+    return {hit, M, Q, e, u1, u2, Ei, Ef, loss: Ei - Ef, pct: Ei > 0 ? (Ei - Ef) / Ei * 100 : 0};
+  },
+  results: (s, R) => R.hit ? [['Velocidade de A após', auto(R.u1), 'm/s', 1], ['Velocidade de B após', auto(R.u2), 'm/s', 1], ['Quantidade de movimento (antes = depois)', auto(R.Q), 'kg·m/s'], ['Energia cinética antes', auto(R.Ei), 'J'], ['Energia cinética depois', auto(R.Ef), 'J'], ['Energia dissipada', `${auto(R.loss)} J (${fmt(R.pct, 1)}%)`, '']] : [['Colisão', 'não ocorre', '']],
+  steps: (s, R) => {
+    if (!R.hit) return li('Verificação:', [`vA = ${num(s.v1)} m/s ≤ vB = ${num(s.v2)} m/s`], 'A não alcança B: não há colisão. Ajuste as velocidades.');
+    return li('Quantidade de movimento antes:', [`Q = mA·vA + mB·vB = ${num(s.m1)} × ${num(s.v1)} + ${num(s.m2)} × ${num(s.v2)} = ${auto(R.Q)} kg·m/s`])
+      + li('Conservação (as forças da colisão são internas e formam par ação e reação):', [`mA·v'A + mB·v'B = ${auto(R.Q)}`])
+      + li('Coeficiente de restituição:', [`e = (v'B − v'A) / (vA − vB) ⇒ v'B − v'A = ${num(R.e)} × (${num(s.v1)} − ${num(s.v2)}) = ${auto(R.e * (s.v1 - s.v2))} m/s`])
+      + li('Resolvendo o sistema:', [`v'A = [Q − mB·e·(vA − vB)] / (mA + mB) = ${auto(R.u1)} m/s`, `v'B = [Q + mA·e·(vA − vB)] / (mA + mB) = ${auto(R.u2)} m/s`], R.u1 < -1e-9 ? 'O sinal negativo indica que A volta (recua) após a colisão.' : '')
+      + li('Energia cinética:', [`Ec antes = ${auto(R.Ei)} J  |  Ec depois = ${auto(R.Ef)} J`, `Dissipada = ${auto(R.loss)} J (${fmt(R.pct, 1)}%)`]);
+  },
+  notes: 'Durante o choque, A empurra B e B empurra A com forças iguais e opostas pelo mesmo tempo: os impulsos se cancelam e a quantidade de movimento total se conserva. A energia cinética só se conserva na colisão elástica.',
+  enun: s => {
+    const tipo = {1: 'perfeitamente elástica', 0.5: 'parcialmente elástica, com coeficiente de restituição 0,5,', 0: 'perfeitamente inelástica (os corpos seguem juntos)'}[+s.e];
+    const vel = v => v === 0 ? 'em repouso' : `com velocidade de ${num(Math.abs(v))} m/s para a ${v > 0 ? 'direita' : 'esquerda'}`;
+    return `${cap(mtxt(s, 1))} (corpo A), ${vel(s.v1)}, colide frontalmente com ${mtxt(s, 2)} (corpo B), ${vel(s.v2)}. Sabendo que a colisão é ${tipo} determine as velocidades dos corpos após o choque e a energia cinética dissipada.`;
+  },
+  dur: () => 3.8,
+  TC: 1.4,
+  geo(w, h, s, R){
+    const sA = fitS(s.b1, w * .17, h * .26), sB = fitS(s.b2, w * .17, h * .26);
+    const wA = DIM[s.b1][0] * sA, wB = DIM[s.b2][0] * sB, xA0 = w * .14 + wA / 2, xB0 = w * .62 + wB / 2;
+    const gap = xB0 - xA0 - (wA + wB) / 2, k = R.hit ? gap / ((s.v1 - s.v2) * this.TC) : 0;
+    return {sA, sB, wA, wB, xA0, xB0, k};
+  },
+  live(s, R, an){
+    const v = an.t < this.TC || !R.hit ? [s.v1, s.v2] : [R.u1, R.u2];
+    return `<span>t = <b>${fmt(an.t, 2)}</b> s</span><span>vA = <b>${fmt(v[0], 2)}</b> m/s</span><span>vB = <b>${fmt(v[1], 2)}</b> m/s</span><span>Q total = <b>${auto(s.m1 * v[0] + s.m2 * v[1])}</b> kg·m/s</span>`;
+  },
+  draw(ctx, w, h, s, R, an){
+    const gy = h * .76, G_ = this.geo(w, h, s, R);
+    floor(ctx, w, h, gy);
+    let xA, xB, vA, vB;
+    if (!R.hit || an.t < this.TC){ xA = G_.xA0 + s.v1 * G_.k * an.t; xB = G_.xB0 + s.v2 * G_.k * an.t; vA = s.v1; vB = s.v2; }
+    else {
+      const cA = G_.xA0 + s.v1 * G_.k * this.TC, cB = G_.xB0 + s.v2 * G_.k * this.TC, dt = an.t - this.TC;
+      xA = cA + R.u1 * G_.k * dt; xB = cB + R.u2 * G_.k * dt; vA = R.u1; vB = R.u2;
+    }
+    const bA = drawBody(ctx, s.b1, xA, gy, G_.sA, C.bodyA, 1), bB = drawBody(ctx, s.b2, xB, gy, G_.sB, C.bodyB, -1);
+    label(ctx, 'A', xA, gy - bA.h - 26); label(ctx, 'B', xB, gy - bB.h - 26);
+    const vmax = Math.max(Math.abs(s.v1), Math.abs(s.v2), Math.abs(R.u1), Math.abs(R.u2), 1e-9), kv = 60 / vmax;
+    if (Math.abs(vA) > 1e-9) arrow(ctx, xA, gy - bA.h - 12, xA + vA * kv, gy - bA.h - 12, C.leaf, '');
+    if (Math.abs(vB) > 1e-9) arrow(ctx, xB, gy - bB.h - 12, xB + vB * kv, gy - bB.h - 12, C.leaf, '');
+    if (R.hit && Math.abs(an.t - this.TC) < .18){
+      const cx = (xA + bA.w / 2 + xB - bB.w / 2) / 2, cy = gy - Math.min(bA.h, bB.h) / 2;
+      arrow(ctx, cx, cy, cx - 50, cy, C.apple, ''); arrow(ctx, cx, cy, cx + 50, cy, C.apple, '');
+    }
+    caption(ctx, w, !R.hit ? 'A não alcança B: não há colisão.' : (an.t === 0 ? 'Toque em Simular.' : (an.t < this.TC ? 'Antes do choque.' : 'Depois do choque: Q total igual ao de antes.')));
+  }
+},
+{
+  id: 'recuo', grupo: 'Momento linear', nome: 'Recuo e explosão',
+  desc: 'Dois corpos inicialmente em repouso se separam (disparo, explosão, empurrão). Calcula velocidade de recuo e força média trocada.',
+  leis: ['3ª Lei', '2ª Lei'], bodies: 2, bodyLabels: ['Corpo A (recua)', 'Corpo B (é lançado)'], def: ['canhao', 'bala'], allow: ORDER, anim: true,
+  inputs: [
+    {id: 'vB', label: 'Velocidade de B após a separação', unit: 'm/s', min: 1e-6},
+    {id: 'dt', label: 'Duração da interação Δt', unit: 's', min: 1e-6}
+  ],
+  defaults: s => { const proj = s.b2 === 'bala'; s.vB = proj ? 300 : 3; s.dt = proj ? 0.01 : 0.4; },
+  compute: s => {
+    const vA = -s.m2 * s.vB / s.m1, Q = s.m2 * s.vB, Fm = Q / s.dt;
+    return {vA, Q, Fm, EA: .5 * s.m1 * vA * vA, EB: .5 * s.m2 * s.vB * s.vB};
+  },
+  results: (s, R) => [['Velocidade de recuo de A', auto(R.vA), 'm/s', 1], ['Quantidade de movimento de cada corpo', auto(R.Q), 'kg·m/s'], ['Força média trocada (par ação e reação)', auto(R.Fm), 'N', 1], ['Energia cinética de A', auto(R.EA), 'J'], ['Energia cinética de B', auto(R.EB), 'J']],
+  steps: (s, R) => li('Antes da separação, tudo em repouso:', ['Q inicial = 0'])
+    + li('Conservação da quantidade de movimento:', [`mA·vA + mB·vB = 0 ⇒ vA = −mB·vB / mA`, `vA = −${num(s.m2)} × ${num(s.vB)} / ${num(s.m1)} = ${auto(R.vA)} m/s`], 'O sinal negativo indica sentido oposto ao de B: é o recuo.')
+    + li('Força média sobre B (2ª Lei na forma de impulso):', [`F = ΔQ / Δt = ${auto(R.Q)} / ${num(s.dt)} = ${auto(R.Fm)} N`])
+    + li('Força sobre A (3ª Lei):', [`F(B em A) = −F(A em B) ⇒ |F| = ${auto(R.Fm)} N, no sentido do recuo`])
+    + li('Energia cinética gerada (vinda da explosão ou do esforço muscular):', [`EcA = ${auto(R.EA)} J  |  EcB = ${auto(R.EB)} J`], 'O corpo mais leve leva quase toda a energia, embora as quantidades de movimento sejam iguais.'),
+  notes: 'As forças de ação e reação têm a mesma intensidade, mas atuam em corpos diferentes, por isso não se anulam. Mesma força e mesmo tempo dão o mesmo impulso: quem tem menos massa ganha mais velocidade.',
+  enun: s => `${cap(mtxt(s, 1))} (corpo A) e ${mtxt(s, 2)} (corpo B) estão inicialmente em repouso e juntos. Após uma interação que dura ${num(s.dt)} s, o corpo B é lançado com velocidade de ${num(s.vB)} m/s. Desprezando atritos, determine a velocidade de recuo do corpo A e a intensidade da força média que um corpo exerce sobre o outro.`,
+  dur: () => 2.8,
+  live(s, R, an){ const on = an.t > 0; return `<span>t = <b>${fmt(an.t, 2)}</b> s</span><span>vA = <b>${fmt(on ? R.vA : 0, 2)}</b> m/s</span><span>vB = <b>${fmt(on ? s.vB : 0, 2)}</b> m/s</span><span>Q total = <b>0</b></span>`; },
+  draw(ctx, w, h, s, R, an){
+    const gy = h * .76, sA = fitS(s.b1, w * .22, h * .3), sB = fitS(s.b2, w * .14, h * .2);
+    const wA = DIM[s.b1][0] * sA, wB = DIM[s.b2][0] * sB;
+    floor(ctx, w, h, gy);
+    const xA0 = w * .45 - wA / 2, xB0 = w * .45 + wB / 2 + (s.b1 === 'canhao' ? -wA * .02 : 0);
+    const k = Math.min(w * .4, 260) / (Math.max(Math.abs(R.vA), s.vB) * 2.2);
+    const t = an.t, xA = xA0 + R.vA * k * t, xB = xB0 + s.vB * k * t;
+    const yB = s.b1 === 'canhao' ? gy - DIM.canhao[1] * sA * .62 + DIM[s.b2][1] * sB / 2 : gy;
+    const bA = drawBody(ctx, s.b1, xA, gy, sA, C.bodyA, 1), bB = drawBody(ctx, s.b2, xB, yB, sB, C.bodyB, 1);
+    label(ctx, 'A', xA, gy - bA.h - 26); label(ctx, 'B', xB, yB - bB.h - 26);
+    if (t > 0 && t < .5){
+      const cy = gy - bA.h / 2, len = 60;
+      arrow(ctx, xA - bA.w / 2 + 6, cy, xA - bA.w / 2 + 6 - len, cy, C.apple, 'F(B em A)');
+      arrow(ctx, xB + bB.w / 2, yB - bB.h / 2, xB + bB.w / 2 + len, yB - bB.h / 2, C.apple, 'F(A em B)');
+    } else if (t >= .5){
+      const kv = 70 / Math.max(Math.abs(R.vA), s.vB);
+      arrow(ctx, xA, gy - bA.h - 12, xA + R.vA * kv - 8, gy - bA.h - 12, C.leaf, 'vA');
+      arrow(ctx, xB, yB - bB.h - 12, xB + s.vB * kv, yB - bB.h - 12, C.leaf, 'vB');
+    }
+    caption(ctx, w, t === 0 ? 'Repouso: Q total = 0. Toque em Simular.' : (t < .5 ? 'Forças iguais e opostas, em corpos diferentes.' : 'Q de A e de B têm mesmo módulo e sentidos opostos.'));
+  }
+},
+/* ---------- ENERGIA ---------- */
+{
+  id: 'energia', grupo: 'Energia', nome: 'Conservação da energia mecânica',
+  desc: 'Corpo percorre uma pista sem atrito do ponto A, passando pelo vale, até o ponto B. Calcula velocidades e energias.',
+  leis: ['2ª Lei'], bodies: 1, bodyLabels: ['Corpo'], def: ['esfera'], allow: NO_PROJ, anim: true,
+  inputs: [
+    {id: 'h1', label: 'Altura do ponto A', unit: 'm', min: 0, val: 20},
+    {id: 'h2', label: 'Altura do ponto B', unit: 'm', min: 0, val: 8},
+    {id: 'v0', label: 'Velocidade em A', unit: 'm/s', min: 0, val: 0}
+  ],
+  compute: s => {
+    const m = s.m1, EcA = .5 * m * s.v0 * s.v0, EpA = m * G * s.h1, E = EcA + EpA;
+    const vF = Math.sqrt(s.v0 * s.v0 + 2 * G * s.h1), v2sq = s.v0 * s.v0 + 2 * G * (s.h1 - s.h2), reach = v2sq >= -1e-9;
+    return {EcA, EpA, E, vF, reach, vB: reach ? Math.sqrt(Math.max(0, v2sq)) : 0, EpB: m * G * s.h2, hmax: s.h1 + s.v0 * s.v0 / (2 * G)};
+  },
+  results: (s, R) => [['Energia mecânica', auto(R.E), 'J'], ['Velocidade no vale (h = 0)', auto(R.vF), 'm/s', 1], ['Velocidade em B', R.reach ? auto(R.vB) : 'não chega', R.reach ? 'm/s' : '', 1], ['Altura máxima atingível', auto(R.hmax), 'm']],
+  steps: (s, R) => {
+    let h = li('Energia mecânica em A:', [`Ec = m·v²/2 = ${num(s.m1)} × ${num(s.v0)}² / 2 = ${auto(R.EcA)} J`, `Ep = m·g·h = ${num(s.m1)} × ${num(G)} × ${num(s.h1)} = ${auto(R.EpA)} J`, `Em = Ec + Ep = ${auto(R.E)} J`])
+      + li('No vale (h = 0), toda a energia é cinética:', [`v = √(v₀² + 2·g·h_A) = √(${num(s.v0)}² + 2 × ${num(G)} × ${num(s.h1)}) = ${auto(R.vF)} m/s`], 'A massa se cancela: qualquer corpo chega com a mesma velocidade.');
+    h += R.reach
+      ? li('Em B (conservação de Em):', [`v_B = √(v₀² + 2·g·(h_A − h_B)) = √(${num(s.v0)}² + 2 × ${num(G)} × (${num(s.h1)} − ${num(s.h2)})) = ${auto(R.vB)} m/s`])
+      : li('Em B:', [`h_máx = h_A + v₀²/(2g) = ${auto(R.hmax)} m < h_B = ${num(s.h2)} m`], 'Sem energia suficiente, o corpo não chega a B: para e volta.');
+    return h;
+  },
+  notes: 'Sem atrito, só o peso realiza trabalho, e a energia mecânica se conserva. O teorema trabalho-energia vem da 2ª Lei: W = ΔEc.',
+  enun: s => `${cap(mtxt(s, 1))} parte do ponto A, a ${num(s.h1)} m de altura, ${s.v0 > 0 ? `com velocidade de ${num(s.v0)} m/s` : 'a partir do repouso'}, e percorre uma pista sem atrito que desce até o nível do solo e sobe até o ponto B, a ${num(s.h2)} m de altura. Considerando g = ${num(G)} m/s², determine a velocidade no ponto mais baixo e no ponto B.`,
+  hh: (s, u) => u <= .5 ? s.h1 * (1 + Math.cos(2 * Math.PI * u)) / 2 : s.h2 * (1 - Math.cos(2 * Math.PI * (u - .5))) / 2,
+  path(w, h, s, R){
+    const gy = h * .86, xL = w * .08, Bw = w * .84, top = 46, kv = (gy - top) / Math.max(s.h1, s.h2, R.hmax > s.h2 ? 0 : 0, .1);
+    const N = 240, pts = []; let T = 0;
+    const kx = (Bw / kv) / 1; // largura em metros na mesma escala vertical
+    for (let i = 0; i <= N; i++){
+      const u = i / N, hm = this.hh(s, u), v = Math.sqrt(Math.max(0, s.v0 * s.v0 + 2 * G * (s.h1 - hm)));
+      if (i > 0){
+        const p = pts[i - 1], ds = Math.hypot(kx / N, hm - p.hm), vm = Math.max((v + p.v) / 2, .05);
+        if (s.v0 * s.v0 + 2 * G * (s.h1 - hm) < 0) break;
+        T += ds / vm;
+      }
+      pts.push({u, hm, v, x: xL + u * Bw, y: gy - hm * kv, T});
+    }
+    return {gy, xL, Bw, kv, pts, Ttot: T};
+  },
+  sp(s, R, P){ return Math.max(P.Ttot / 4, .05); },
+  dur(s, R){ return 4.4; },
+  at(P, tt){
+    const pts = P.pts; if (tt >= pts[pts.length - 1].T) return pts[pts.length - 1];
+    let i = 1; while (i < pts.length && pts[i].T < tt) i++;
+    const a = pts[i - 1], b = pts[i], f = (tt - a.T) / Math.max(b.T - a.T, 1e-9);
+    return {x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f, hm: a.hm + (b.hm - a.hm) * f, v: a.v + (b.v - a.v) * f, i};
+  },
+  live(s, R, an){
+    const st = this._live; if (!st) return '';
+    const Ep = s.m1 * G * st.hm, Ec = Math.max(0, R.E - Ep), tot = Math.max(R.E, 1e-9);
+    const bar = (n, v, c) => `<div class="ebar"><span>${n}</span><i style="width:${clamp(v / tot * 100, 0, 100)}%;background:${c}"></i><span>${auto(v)} J</span></div>`;
+    return `<span>h = <b>${fmt(st.hm, 2)}</b> m</span><span>v = <b>${fmt(st.v, 2)}</b> m/s</span>` + bar('Ec', Ec, 'var(--leaf)') + bar('Ep', Ep, 'var(--sky)') + bar('Em', R.E, 'var(--ink)');
+  },
+  draw(ctx, w, h, s, R, an){
+    const P = this.path(w, h, s, R);
+    ctx.fillStyle = C.ground; ctx.beginPath(); ctx.moveTo(P.xL, P.gy);
+    for (let i = 0; i <= 240; i++){ const u = i / 240; ctx.lineTo(P.xL + u * P.Bw, P.gy - this.hh(s, u) * P.kv); }
+    ctx.lineTo(P.xL + P.Bw, P.gy); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 2.5; ctx.beginPath();
+    for (let i = 0; i <= 240; i++){ const u = i / 240, X = P.xL + u * P.Bw, Y = P.gy - this.hh(s, u) * P.kv; i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); }
+    ctx.stroke();
+    ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, P.gy); ctx.lineTo(w, P.gy); ctx.stroke();
+    ctx.fillStyle = C.muted; ctx.font = '14px ' + HAND; ctx.textBaseline = 'bottom';
+    ctx.textAlign = 'left'; ctx.fillText(`A (${num(s.h1)} m)`, P.xL + 4, P.gy - s.h1 * P.kv - 22);
+    ctx.textAlign = 'right'; ctx.fillText(`B (${num(s.h2)} m)`, P.xL + P.Bw - 4, P.gy - s.h2 * P.kv - 22);
+    if (!R.reach){
+      const yM = P.gy - R.hmax * P.kv; ctx.setLineDash([4, 5]); ctx.strokeStyle = C.apple; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(P.xL, yM); ctx.lineTo(P.xL + P.Bw, yM); ctx.stroke(); ctx.setLineDash([]);
+    }
+    const tt = an.t * this.sp(s, R, P), q = this.at(P, tt);
+    const j = Math.min(Math.max(q.i || 1, 1), P.pts.length - 1), a = P.pts[j - 1], b = P.pts[j];
+    const ang = Math.atan2(b.y - a.y, b.x - a.x);
+    ctx.save(); ctx.translate(q.x, q.y); ctx.rotate(ang); drawBody(ctx, s.b1, 0, 0, fitS(s.b1, w * .1, h * .1), C.bodyA); ctx.restore();
+    this._live = q;
+    caption(ctx, w, an.t === 0 ? 'Toque em Simular.' : (!R.reach && tt >= P.Ttot ? 'Não chega a B: a energia acabou antes.' : 'Ep vira Ec na descida e Ec vira Ep na subida.'), w * .55);
+  }
+},
+/* ---------- MOVIMENTO CIRCULAR ---------- */
+{
+  id: 'centripeta', grupo: 'Movimento circular', nome: 'Força centrípeta em curvas',
+  desc: 'Corpo fazendo uma curva plana. Calcula a força centrípeta e verifica se o atrito é suficiente para não derrapar.',
+  leis: ['1ª Lei', '2ª Lei'], bodies: 1, bodyLabels: ['Corpo'], def: ['carro'], allow: NO_PROJ, anim: true,
+  inputs: [
+    {id: 'v', label: 'Velocidade v', unit: 'm/s', min: 1e-6, val: 15},
+    {id: 'R', label: 'Raio da curva R', unit: 'm', min: 1e-6, val: 50},
+    {id: 'mu', label: 'Coeficiente de atrito lateral μ', unit: '', min: 0, max: 2, val: 0.6}
+  ],
+  compute: s => {
+    const ac = s.v * s.v / s.R, Fc = s.m1 * ac, Fmax = s.mu * s.m1 * G, vmax = Math.sqrt(s.mu * G * s.R);
+    return {ac, Fc, Fmax, vmax, skid: s.v > vmax + 1e-9, T: 2 * Math.PI * s.R / s.v};
+  },
+  results: (s, R) => [['Aceleração centrípeta', auto(R.ac), 'm/s²'], ['Força centrípeta necessária', auto(R.Fc), 'N', 1], ['Atrito máximo disponível', auto(R.Fmax), 'N'], ['Velocidade máxima sem derrapar', `${auto(R.vmax)} (${auto(R.vmax * 3.6)} km/h)`, 'm/s', 1], ['Situação', R.skid ? 'derrapa' : 'faz a curva', ''], ['Período de uma volta', auto(R.T), 's']],
+  steps: (s, R) => li('Aceleração centrípeta:', [`ac = v² / R = ${num(s.v)}² / ${num(s.R)} = ${auto(R.ac)} m/s²`])
+    + li('Força centrípeta (2ª Lei na direção do centro):', [`Fc = m·ac = ${num(s.m1)} × ${auto(R.ac)} = ${auto(R.Fc)} N`])
+    + li('Quem fornece a centrípeta numa curva plana é o atrito lateral:', [`Fat,máx = μ·m·g = ${num(s.mu)} × ${num(s.m1)} × ${num(G)} = ${auto(R.Fmax)} N`])
+    + li('Condição para não derrapar:', [`μ·m·g ≥ m·v²/R ⇒ v_máx = √(μ·g·R) = √(${num(s.mu)} × ${num(G)} × ${num(s.R)}) = ${auto(R.vmax)} m/s`], 'A massa se cancela: um caminhão e um carro têm o mesmo limite.')
+    + li('Comparação:', [`v = ${num(s.v)} m/s ${R.skid ? '>' : '≤'} v_máx = ${auto(R.vmax)} m/s`], R.skid ? 'Derrapa: falta força para o centro e o corpo tende a seguir em linha reta (1ª Lei).' : 'Faz a curva com segurança.'),
+  notes: 'A centrípeta não é uma força nova: é o nome da resultante que aponta para o centro. Sem ela, vale a 1ª Lei e o corpo segue pela tangente.',
+  enun: s => `${cap(mtxt(s, 1))} percorre uma curva plana e horizontal de raio ${num(s.R)} m com velocidade de ${num(s.v)} m/s. O coeficiente de atrito lateral é ${num(s.mu)}. Considerando g = ${num(G)} m/s², determine a força centrípeta necessária e verifique se o corpo consegue fazer a curva sem derrapar.`,
+  REL: 1.6, W: 1.4,
+  dur(s, R){ return R.skid ? this.REL + 2.2 : 9; },
+  live(s, R, an){ return `<span>v = <b>${fmt(s.v, 2)}</b> m/s</span><span>Fc necessária = <b>${auto(R.Fc)}</b> N</span><span>Fat máx = <b>${auto(R.Fmax)}</b> N</span>`; },
+  draw(ctx, w, h, s, R, an){
+    const cx = w / 2, cy = h * .55, r = Math.min(w, h) * .32;
+    ctx.fillStyle = C.paper; ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = C.ground; ctx.lineWidth = 26; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = C.rule; ctx.lineWidth = 1; ctx.setLineDash([6, 6]); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = C.ink; ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.font = '12px ' + MONO; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillStyle = C.muted; ctx.fillText(`R = ${num(s.R)} m`, cx, cy + 6);
+    const t = an.t, release = R.skid && t > this.REL, phi0 = -Math.PI / 2;
+    let phi = phi0 + this.W * (release ? this.REL : t), px = cx + r * Math.cos(phi), py = cy + r * Math.sin(phi);
+    const tx = -Math.sin(phi), ty = Math.cos(phi);
+    if (release){ const d = (t - this.REL) * this.W * r; px += tx * d; py += ty * d;
+      ctx.setLineDash([4, 5]); ctx.strokeStyle = C.apple; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx + r * Math.cos(phi), cy + r * Math.sin(phi)); ctx.lineTo(px, py); ctx.stroke(); ctx.setLineDash([]); }
+    const sz = fitS(s.b1, r * .45, r * .3);
+    ctx.save(); ctx.translate(px, py); ctx.rotate(Math.atan2(ty, tx)); const b = drawBody(ctx, s.b1, 0, DIM[s.b1][1] * sz / 2, sz, C.bodyA); ctx.restore();
+    arrow(ctx, px, py, px + tx * 60, py + ty * 60, C.leaf, 'v');
+    if (!release){ const dx = cx - px, dy = cy - py, L = Math.hypot(dx, dy); arrow(ctx, px, py, px + dx / L * Math.min(70, r * .6), py + dy / L * Math.min(70, r * .6), C.apple, 'Fc'); }
+    caption(ctx, w, an.t === 0 ? 'Toque em Simular.' : (release ? 'Derrapou: sem centrípeta suficiente, segue pela tangente (1ª Lei).' : 'O atrito aponta para o centro e faz o papel de centrípeta.'), w - 28);
+  }
+}
+];
+
+/* ================= assuntos adicionais ================= */
+const fh = (s0, v) => `${num(s0)} ${v < 0 ? '−' : '+'} ${num(Math.abs(v))}·t`;
+const dirTxt = v => v === 0 ? 'em repouso' : `com velocidade constante de ${num(Math.abs(v))} m/s para a ${v > 0 ? 'direita' : 'esquerda'}`;
+const prog = (an, D) => (an.run || an.t > 0) ? Math.min(1, an.t / D) : 1;
+const btxt = (s, k) => body(s, k).txt;
+function graph(ctx, x, y, w, h, fns, T, tc, cols, yl, xl){
+  const N = 80; let lo = 0, hi = 0;
+  fns.forEach(fn => { for (let i = 0; i <= N; i++){ const v = fn(T * i / N); lo = Math.min(lo, v); hi = Math.max(hi, v); } });
+  if (hi - lo < 1e-9){ hi += 1; lo -= 1; }
+  const X = t => x + (t / T) * w, Y = v => y + h - (v - lo) / (hi - lo) * h;
+  ctx.strokeStyle = C.muted; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + h); ctx.moveTo(x, Y(0)); ctx.lineTo(x + w, Y(0)); ctx.stroke();
+  ctx.fillStyle = C.muted; ctx.font = '14px ' + HAND; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; ctx.fillText(yl, x + 5, y + 4);
+  ctx.textAlign = 'right'; ctx.textBaseline = 'top'; ctx.fillText(xl, x + w, Y(0) + 3);
+  fns.forEach((fn, k) => {
+    const line = (t1, alpha) => { ctx.globalAlpha = alpha; ctx.strokeStyle = cols[k]; ctx.lineWidth = 2.5; ctx.beginPath();
+      for (let i = 0; i <= N; i++){ const t = t1 * i / N; i ? ctx.lineTo(X(t), Y(fn(t))) : ctx.moveTo(X(t), Y(fn(t))); } ctx.stroke(); ctx.globalAlpha = 1; };
+    line(T, .2); if (tc > 0) line(Math.min(tc, T), 1);
+  });
+  return {X, Y};
+}
+function spring(ctx, x, y1, y2, wd, n){
+  const L = y2 - y1, e = Math.min(10, L * .12);
+  ctx.strokeStyle = C.ink; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(x, y1); ctx.lineTo(x, y1 + e);
+  for (let i = 0; i < n; i++) ctx.lineTo(x + (i % 2 ? -wd : wd), y1 + e + (L - 2 * e) * (i + .5) / n);
+  ctx.lineTo(x, y2 - e); ctx.lineTo(x, y2); ctx.stroke();
+}
+function hspring(ctx, x1, x2, y, ht, n){
+  const L = x2 - x1, e = Math.min(8, L * .1);
+  ctx.strokeStyle = C.ink; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x1 + e, y);
+  for (let i = 0; i < n; i++) ctx.lineTo(x1 + e + (L - 2 * e) * (i + .5) / n, y + (i % 2 ? -ht : ht));
+  ctx.lineTo(x2 - e, y); ctx.lineTo(x2, y); ctx.stroke();
+}
+function dashLine(ctx, x1, y1, x2, y2, col){
+  ctx.setLineDash([5, 5]); ctx.strokeStyle = col || C.muted; ctx.lineWidth = 1.3;
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
+}
+function hand(ctx, text, x, y, col, align, base, size){
+  ctx.fillStyle = col || C.muted; ctx.font = (size || 15) + 'px ' + HAND; ctx.textAlign = align || 'left'; ctx.textBaseline = base || 'bottom';
+  ctx.fillText(text, x, y);
+}
+function hatchTop(ctx, x1, x2, y){
+  ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.stroke();
+  ctx.lineWidth = 1; ctx.beginPath(); for (let x = x1; x < x2; x += 10){ ctx.moveTo(x, y); ctx.lineTo(x + 8, y - 8); } ctx.stroke();
+}
+const LIFT = ['bloco','particula','esfera','pessoa'];
+
+const NEW = [
+/* ---------- CINEMÁTICA ---------- */
+{
+  id: 'mru', grupo: 'Cinemática', nome: 'MRU e encontro de móveis',
+  desc: 'Dois corpos com velocidade constante na mesma reta. Monta as funções horárias e encontra quando e onde se cruzam.',
+  leis: ['1ª Lei'], bodies: 2, noMass: true, bodyLabels: ['Corpo A', 'Corpo B'], def: ['carro', 'caminhao'], allow: NO_PROJ, anim: true,
+  inputs: [
+    {id: 'sA', label: 'Posição inicial de A', unit: 'm', val: 0},
+    {id: 'vA', label: 'Velocidade de A', unit: 'm/s', val: 20, hint: 'Positivo para a direita, negativo para a esquerda.'},
+    {id: 'sB', label: 'Posição inicial de B', unit: 'm', val: 300},
+    {id: 'vB', label: 'Velocidade de B', unit: 'm/s', val: -10}
+  ],
+  compute: s => {
+    const dv = s.vA - s.vB, t = Math.abs(dv) > 1e-12 ? (s.sB - s.sA) / dv : NaN, meet = isFinite(t) && t >= 0;
+    return {dv, t, meet, s: meet ? s.sA + s.vA * t : NaN, Tshow: meet ? Math.max(t * 1.3, 1) : 10};
+  },
+  results: (s, R) => [['Função horária de A', `sA = ${fh(s.sA, s.vA)}`, ''], ['Função horária de B', `sB = ${fh(s.sB, s.vB)}`, ''],
+    ...(R.meet ? [['Instante do encontro', auto(R.t), 's', 1], ['Posição do encontro', auto(R.s), 'm', 1], ['Distância percorrida por A', auto(Math.abs(s.vA * R.t)), 'm'], ['Distância percorrida por B', auto(Math.abs(s.vB * R.t)), 'm']] : [['Encontro', 'não ocorre', '']])],
+  steps: (s, R) => {
+    let h = li('Função horária do MRU, s = s₀ + v·t:', [`sA = ${fh(s.sA, s.vA)}`, `sB = ${fh(s.sB, s.vB)}`])
+      + li('No encontro, as posições são iguais:', [`sA = sB ⇒ ${fh(s.sA, s.vA)} = ${fh(s.sB, s.vB)}`]);
+    if (!isFinite(R.t)) return h + li('Velocidades iguais:', [`vA − vB = 0`], 'Os corpos mantêm a mesma distância: não há encontro (ou já estão juntos).');
+    h += li('Isolando t:', [`t = (sB₀ − sA₀) / (vA − vB) = (${num(s.sB)} − ${num(s.sA)}) / (${num(s.vA)} − ${num(s.vB)}) = ${auto(R.t)} s`]);
+    if (!R.meet) return h + li('Tempo negativo:', [], 'Os corpos estão se afastando: o encontro só teria ocorrido no passado.');
+    return h + li('Posição do encontro (substituindo t em sA):', [`s = ${fh(s.sA, s.vA)} → ${num(s.sA)} + ${num(s.vA)} × ${auto(R.t)} = ${auto(R.s)} m`]);
+  },
+  notes: 'No gráfico s × t, cada função horária é uma reta, e o encontro é o ponto onde as retas se cruzam.',
+  enun: s => `${cap(btxt(s, 1))} (A) parte da posição ${num(s.sA)} m ${dirTxt(s.vA)}, e ${btxt(s, 2)} (B) parte da posição ${num(s.sB)} m ${dirTxt(s.vB)}, na mesma trajetória retilínea. Determine as funções horárias, o instante e a posição do encontro.`,
+  dur: () => 4,
+  live(s, R, an){ const t = prog(an, 4) * R.Tshow; return `<span>t = <b>${fmt(t, 2)}</b> s</span><span>sA = <b>${fmt(s.sA + s.vA * t, 1)}</b> m</span><span>sB = <b>${fmt(s.sB + s.vB * t, 1)}</b> m</span>`; },
+  draw(ctx, w, h, s, R, an){
+    const Tm = R.Tshow, tt = prog(an, 4) * Tm;
+    const xs = [s.sA, s.sB, s.sA + s.vA * Tm, s.sB + s.vB * Tm];
+    let lo = Math.min(...xs), hi = Math.max(...xs); const pad = (hi - lo || 10) * .08; lo -= pad; hi += pad;
+    const x0 = 30, scale = (w - 60) / (hi - lo), gy = h * .4, X = m => x0 + (m - lo) * scale;
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
+    ruler(ctx, w, h, gy, lo, scale, x0, false, true);
+    if (R.meet){ dashLine(ctx, X(R.s), gy - h * .26, X(R.s), gy, C.apple); hand(ctx, 'encontro', X(R.s) + 4, gy - h * .26 + 16, C.apple); }
+    const pA = s.sA + s.vA * tt, pB = s.sB + s.vB * tt;
+    const bA = drawBody(ctx, s.b1, X(pA), gy, fitS(s.b1, w * .12, h * .13), C.bodyA, s.vA < 0 ? -1 : 1);
+    label(ctx, 'A', X(pA), gy - bA.h - 4);
+    const bB = drawBody(ctx, s.b2, X(pB), gy, fitS(s.b2, w * .12, h * .13), C.bodyB, s.vB < 0 ? -1 : 1);
+    label(ctx, 'B', X(pB), gy - bB.h - 4);
+    const g = graph(ctx, 44, h * .58, w - 70, h * .34, [t => s.sA + s.vA * t, t => s.sB + s.vB * t], Tm, tt, [C.sky, C.brass], 's (m)', 't (s)');
+    if (R.meet && tt >= R.t){ ctx.fillStyle = C.apple; ctx.beginPath(); ctx.arc(g.X(R.t), g.Y(R.s), 5, 0, Math.PI * 2); ctx.fill(); }
+    hand(ctx, 'A', w - 22, h * .58 + 12, C.sky, 'left', 'top', 16); hand(ctx, 'B', w - 22, h * .58 + 30, C.brass, 'left', 'top', 16);
+  }
+},
+{
+  id: 'mruv', grupo: 'Cinemática', nome: 'MRUV e gráficos',
+  desc: 'Movimento com aceleração constante. Calcula posição e velocidade num instante e desenha os gráficos v × t e s × t.',
+  leis: ['2ª Lei'], bodies: 1, noMass: true, bodyLabels: ['Corpo'], def: ['carro'], allow: NO_PROJ, anim: true,
+  inputs: [
+    {id: 's0', label: 'Posição inicial s₀', unit: 'm', val: 0},
+    {id: 'v0', label: 'Velocidade inicial v₀', unit: 'm/s', val: 5},
+    {id: 'a', label: 'Aceleração a', unit: 'm/s²', val: 2, hint: 'Negativa quando contrária ao sentido positivo.'},
+    {id: 't', label: 'Instante t', unit: 's', min: 1e-6, val: 4}
+  ],
+  compute: s => {
+    const v = s.v0 + s.a * s.t, S = s.s0 + s.v0 * s.t + s.a * s.t * s.t / 2, ds = S - s.s0;
+    const tstop = Math.abs(s.a) > 1e-12 && s.v0 * s.a < 0 ? -s.v0 / s.a : NaN;
+    return {v, S, ds, vm: ds / s.t, tstop};
+  },
+  results: (s, R) => [['Velocidade no instante t', auto(R.v), 'm/s', 1], ['Posição no instante t', auto(R.S), 'm', 1], ['Deslocamento Δs', auto(R.ds), 'm'], ['Velocidade média', auto(R.vm), 'm/s'], ...(isFinite(R.tstop) ? [['Instante em que v = 0 (inversão)', auto(R.tstop), 's']] : [])],
+  steps: (s, R) => li('Função da velocidade:', [`v = v₀ + a·t = ${num(s.v0)} + ${num(s.a)} × ${num(s.t)} = ${auto(R.v)} m/s`])
+    + li('Função horária da posição:', [`s = s₀ + v₀·t + a·t²/2 = ${num(s.s0)} + ${num(s.v0)} × ${num(s.t)} + ${num(s.a)} × ${num(s.t)}² / 2 = ${auto(R.S)} m`])
+    + li('Conferência por Torricelli:', [`v² = v₀² + 2·a·Δs ⇒ ${auto(R.v * R.v)} = ${num(s.v0)}² + 2 × ${num(s.a)} × ${auto(R.ds)} = ${auto(s.v0 * s.v0 + 2 * s.a * R.ds)} ✓`])
+    + li('Velocidade média:', [`vm = Δs / Δt = ${auto(R.ds)} / ${num(s.t)} = ${auto(R.vm)} m/s`, `vm = (v₀ + v) / 2 = ${auto((s.v0 + R.v) / 2)} m/s ✓`])
+    + (isFinite(R.tstop) ? li('Inversão do sentido (v = 0):', [`0 = ${num(s.v0)} + ${num(s.a)}·t ⇒ t = ${auto(R.tstop)} s`]) : ''),
+  notes: 'No gráfico v × t, a inclinação é a aceleração e a área sob a reta é o deslocamento. O gráfico s × t é uma parábola.',
+  enun: s => `${cap(btxt(s, 1))} parte da posição ${num(s.s0)} m com velocidade de ${num(s.v0)} m/s e aceleração constante de ${num(s.a)} m/s². Determine a velocidade e a posição no instante t = ${num(s.t)} s e esboce os gráficos v × t e s × t.`,
+  dur: () => 3.5,
+  live(s, R, an){ const t = prog(an, 3.5) * s.t; return `<span>t = <b>${fmt(t, 2)}</b> s</span><span>v = <b>${fmt(s.v0 + s.a * t, 2)}</b> m/s</span><span>s = <b>${fmt(s.s0 + s.v0 * t + s.a * t * t / 2, 2)}</b> m</span>`; },
+  draw(ctx, w, h, s, R, an){
+    const tt = prog(an, 3.5) * s.t, pos = t => s.s0 + s.v0 * t + s.a * t * t / 2, vel = t => s.v0 + s.a * t;
+    let lo = Infinity, hi = -Infinity; for (let i = 0; i <= 50; i++){ const p = pos(s.t * i / 50); lo = Math.min(lo, p); hi = Math.max(hi, p); }
+    const pad = (hi - lo || 10) * .1; lo -= pad; hi += pad;
+    const x0 = 30, scale = (w - 60) / (hi - lo), gy = h * .34;
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
+    ruler(ctx, w, h, gy, lo, scale, x0, false, true);
+    const px = x0 + (pos(tt) - lo) * scale, v = vel(tt), b = drawBody(ctx, s.b1, px, gy, fitS(s.b1, w * .12, h * .12), C.bodyA, v < 0 ? -1 : 1);
+    if (Math.abs(v) > 1e-9) arrow(ctx, px, gy - b.h - 10, px + clamp(v * 6, -60, 60), gy - b.h - 10, C.leaf, '');
+    const gw = (w - 100) / 2;
+    graph(ctx, 40, h * .54, gw, h * .38, [vel], s.t, tt, [C.leaf], 'v (m/s)', 't (s)');
+    graph(ctx, 70 + gw, h * .54, gw, h * .38, [pos], s.t, tt, [C.sky], 's (m)', 't (s)');
+  }
+},
+{
+  id: 'queda', grupo: 'Cinemática', nome: 'Queda livre e lançamento vertical',
+  desc: 'Corpo solto ou lançado na vertical. Calcula altura máxima, tempo até o chão e velocidade de impacto.',
+  leis: ['2ª Lei'], bodies: 1, noMass: true, bodyLabels: ['Corpo'], def: ['esfera'], allow: ['esfera','particula','bloco','pessoa','bala'], anim: true,
+  inputs: [
+    {id: 'h0', label: 'Altura inicial', unit: 'm', min: 0, val: 45},
+    {id: 'v0', label: 'Velocidade inicial', unit: 'm/s', val: 0, hint: 'Positivo para cima, negativo para baixo. Use 0 para queda livre.'}
+  ],
+  check: s => s.h0 === 0 && s.v0 <= 0 ? 'Com altura zero, a velocidade inicial precisa ser para cima.' : null,
+  compute: s => {
+    const up = s.v0 > 0, ts = up ? s.v0 / G : 0, hmax = up ? s.h0 + s.v0 * s.v0 / (2 * G) : s.h0;
+    const vc = Math.sqrt(s.v0 * s.v0 + 2 * G * s.h0), tq = (s.v0 + vc) / G;
+    return {up, ts, hmax, vc, tq};
+  },
+  results: (s, R) => [...(R.up ? [['Tempo de subida', auto(R.ts), 's'], ['Altura máxima', auto(R.hmax), 'm', 1]] : []), ['Tempo até o chão', auto(R.tq), 's', 1], ['Velocidade ao chegar ao chão', `${auto(R.vc)} (${auto(R.vc * 3.6)} km/h)`, 'm/s', 1]],
+  steps: (s, R) => {
+    let h = li('Referencial para cima, origem no chão (a = −g):', [`h(t) = ${num(s.h0)} + ${num(s.v0)}·t − ${num(G)}·t²/2`, `v(t) = ${num(s.v0)} − ${num(G)}·t`]);
+    if (R.up) h += li('Subida até parar (v = 0):', [`t_s = v₀ / g = ${num(s.v0)} / ${num(G)} = ${auto(R.ts)} s`, `h_máx = h₀ + v₀² / (2g) = ${num(s.h0)} + ${num(s.v0)}² / (2 × ${num(G)}) = ${auto(R.hmax)} m`]);
+    h += li('Tempo até o chão (h = 0, raiz positiva):', [`t = [v₀ + √(v₀² + 2·g·h₀)] / g = [${num(s.v0)} + √(${num(s.v0)}² + 2 × ${num(G)} × ${num(s.h0)})] / ${num(G)} = ${auto(R.tq)} s`])
+      + li('Velocidade de impacto (Torricelli):', [`v = √(v₀² + 2·g·h₀) = ${auto(R.vc)} m/s = ${auto(R.vc * 3.6)} km/h`]);
+    return h;
+  },
+  notes: 'Sem resistência do ar, a massa não interfere: todos os corpos caem com a mesma aceleração g (Galileu). A única força é o peso, e pela 2ª Lei a = P/m = g.',
+  enun: s => `${cap(btxt(s, 1))} é ${s.v0 > 0 ? `lançad${o(s, 1)} verticalmente para cima com velocidade de ${num(s.v0)} m/s` : s.v0 < 0 ? `lançad${o(s, 1)} verticalmente para baixo com velocidade de ${num(-s.v0)} m/s` : 'abandonad' + o(s, 1)} a partir de uma altura de ${num(s.h0)} m. Desprezando a resistência do ar e considerando g = ${num(G)} m/s², determine ${s.v0 > 0 ? 'a altura máxima, ' : ''}o tempo até atingir o chão e a velocidade de impacto.`,
+  dur: () => 3.5,
+  live(s, R, an){ const t = prog(an, 3.5) * R.tq; return `<span>t = <b>${fmt(t, 2)}</b> s</span><span>h = <b>${fmt(Math.max(0, s.h0 + s.v0 * t - G * t * t / 2), 2)}</b> m</span><span>v = <b>${fmt(s.v0 - G * t, 2)}</b> m/s</span>`; },
+  draw(ctx, w, h, s, R, an){
+    const tt = prog(an, 3.5) * R.tq, hp = Math.max(0, s.h0 + s.v0 * tt - G * tt * tt / 2), v = s.v0 - G * tt;
+    const gy = h * .9, top = 40, scale = (gy - top) / Math.max(R.hmax, 1);
+    floor(ctx, w, h, gy);
+    const step = niceStep(scale), lab = Math.max(1, Math.ceil(28 / (step * scale)));
+    ctx.strokeStyle = C.muted; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(48, gy); ctx.lineTo(48, top - 10); ctx.stroke();
+    for (let i = 0; i * step <= R.hmax + 1e-9; i++){
+      const y = gy - i * step * scale; ctx.beginPath(); ctx.moveTo(44, y); ctx.lineTo(52, y); ctx.stroke();
+      if (i % lab === 0) hand(ctx, num(i * step) + ' m', 40, y + 7, C.muted, 'right', 'bottom', 13);
+    }
+    const bx = w * .5;
+    if (s.h0 > 0){
+      const bt = gy - s.h0 * scale, x1 = w * .22, x2 = bx - 24;
+      ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.strokeRect(x1, bt, x2 - x1, gy - bt);
+      ctx.lineWidth = 1; for (let y = bt + 12; y < gy - 14; y += 22) for (let x = x1 + 10; x < x2 - 14; x += 20) ctx.strokeRect(x, y, 9, 11);
+    }
+    if (R.up){ dashLine(ctx, bx - 40, gy - R.hmax * scale, bx + 80, gy - R.hmax * scale, C.brass); hand(ctx, 'h máx', bx + 84, gy - R.hmax * scale + 7, C.brass); }
+    const sz = fitS(s.b1, w * .1, h * .09), b = drawBody(ctx, s.b1, bx, gy - hp * scale, sz, C.bodyA);
+    const cy = gy - hp * scale - b.h / 2;
+    if (Math.abs(v) > 1e-9) arrow(ctx, bx + b.w / 2 + 14, cy, bx + b.w / 2 + 14, cy - clamp(v / R.vc * 70, -70, 70), C.leaf, 'v');
+    arrow(ctx, bx - b.w / 2 - 14, cy, bx - b.w / 2 - 14, cy + 34, C.weight, 'g');
+  }
+},
+{
+  id: 'lancamento', grupo: 'Cinemática', nome: 'Lançamento oblíquo e horizontal',
+  desc: 'Corpo lançado com velocidade inclinada (ou horizontal). Decompõe a velocidade e calcula alcance, altura máxima e tempo de voo.',
+  leis: ['1ª Lei', '2ª Lei'], bodies: 1, noMass: true, bodyLabels: ['Corpo'], def: ['esfera'], allow: ['esfera','particula','bala','bloco','pessoa'], anim: true,
+  inputs: [
+    {id: 'v0', label: 'Velocidade de lançamento v₀', unit: 'm/s', min: 1e-6, val: 20},
+    {id: 'ang', label: 'Ângulo com a horizontal', unit: '°', min: 0, max: 90, val: 45, hint: 'Use 0° para lançamento horizontal.'},
+    {id: 'h0', label: 'Altura de lançamento', unit: 'm', min: 0, val: 0}
+  ],
+  check: s => s.h0 === 0 && s.ang === 0 ? 'Com altura zero, o ângulo precisa ser maior que 0°.' : null,
+  compute: s => {
+    const th = s.ang * D2R, vx = s.v0 * Math.cos(th), vy = s.v0 * Math.sin(th), ts = vy / G, H = s.h0 + vy * vy / (2 * G);
+    const T = (vy + Math.sqrt(vy * vy + 2 * G * s.h0)) / G, A = vx * T, vyf = vy - G * T;
+    return {th, vx, vy, ts, H, T, A, vi: Math.hypot(vx, vyf), angi: Math.atan2(-vyf, vx) / D2R};
+  },
+  results: (s, R) => [['Componente horizontal vx', auto(R.vx), 'm/s'], ['Componente vertical inicial vy', auto(R.vy), 'm/s'], ['Altura máxima', auto(R.H), 'm', 1], ['Tempo de voo', auto(R.T), 's'], ['Alcance horizontal', auto(R.A), 'm', 1], ['Velocidade de impacto', auto(R.vi), 'm/s'], ['Ângulo de impacto (abaixo da horizontal)', auto(R.angi), '°']],
+  steps: (s, R) => li('Decomposição da velocidade:', [`vx = v₀·cos θ = ${num(s.v0)} × cos ${num(s.ang)}° = ${auto(R.vx)} m/s`, `vy = v₀·sen θ = ${num(s.v0)} × sen ${num(s.ang)}° = ${auto(R.vy)} m/s`])
+    + li('Na horizontal não há força: MRU (1ª Lei). Na vertical age o peso: MUV com a = −g (2ª Lei).', [`x = ${auto(R.vx)}·t`, `y = ${num(s.h0)} + ${auto(R.vy)}·t − ${num(G)}·t²/2`])
+    + (R.vy > 0 ? li('Subida (vy = 0 no ponto mais alto):', [`t_s = vy / g = ${auto(R.ts)} s`, `H = h₀ + vy² / (2g) = ${auto(R.H)} m`]) : '')
+    + li('Tempo de voo (y = 0):', [`t = [vy + √(vy² + 2·g·h₀)] / g = ${auto(R.T)} s`])
+    + li('Alcance:', [`A = vx·t = ${auto(R.vx)} × ${auto(R.T)} = ${auto(R.A)} m`])
+    + li('Velocidade no impacto:', [`vy final = vy − g·t = ${auto(R.vy - G * R.T)} m/s`, `v = √(vx² + vy²) = ${auto(R.vi)} m/s`]),
+  notes: 'Do chão ao chão, o alcance máximo ocorre a 45°, e ângulos complementares (30° e 60°, por exemplo) dão o mesmo alcance.',
+  enun: s => `${cap(btxt(s, 1))} é lançad${o(s, 1)} ${s.h0 > 0 ? `de uma altura de ${num(s.h0)} m` : 'do solo'} com velocidade de ${num(s.v0)} m/s ${s.ang === 0 ? 'na horizontal' : `formando ${num(s.ang)}° com a horizontal`}. Desprezando a resistência do ar e considerando g = ${num(G)} m/s², determine a altura máxima, o tempo de voo e o alcance horizontal.`,
+  dur: () => 3.5,
+  live(s, R, an){ const t = prog(an, 3.5) * R.T; return `<span>t = <b>${fmt(t, 2)}</b> s</span><span>x = <b>${fmt(R.vx * t, 2)}</b> m</span><span>y = <b>${fmt(Math.max(0, s.h0 + R.vy * t - G * t * t / 2), 2)}</b> m</span>`; },
+  draw(ctx, w, h, s, R, an){
+    const tt = prog(an, 3.5) * R.T, gy = h * .88, x0 = s.h0 > 0 ? 70 : 34;
+    const scale = Math.min((w - x0 - 40) / Math.max(R.A, 1), (gy - 50) / Math.max(R.H, 1));
+    const X = x => x0 + x * scale, Y = y => gy - y * scale;
+    floor(ctx, w, h, gy);
+    if (s.h0 > 0){ ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.strokeRect(x0 - 40, Y(s.h0), 40, gy - Y(s.h0)); }
+    ctx.setLineDash([4, 5]); ctx.strokeStyle = C.muted; ctx.lineWidth = 1.5; ctx.beginPath();
+    for (let i = 0; i <= 60; i++){ const t = R.T * i / 60, x = X(R.vx * t), y = Y(s.h0 + R.vy * t - G * t * t / 2); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    ctx.stroke(); ctx.setLineDash([]);
+    if (R.vy > 0){ dashLine(ctx, X(R.vx * R.ts), Y(R.H), X(R.vx * R.ts), gy, C.brass); hand(ctx, `H = ${auto(R.H)} m`, X(R.vx * R.ts) + 6, Y(R.H) - 4, C.brass); }
+    hand(ctx, `A = ${auto(R.A)} m`, X(R.A), gy + 20, C.brass, 'right', 'bottom');
+    const px = X(R.vx * tt), py = Y(Math.max(0, s.h0 + R.vy * tt - G * tt * tt / 2)), sz = fitS(s.b1, w * .06, h * .06);
+    const b = drawBody(ctx, s.b1, px, py + DIM[s.b1][1] * sz / 2, sz, C.bodyA);
+    const k = 55 / s.v0, vyt = R.vy - G * tt;
+    arrow(ctx, px, py, px + R.vx * k, py, C.sky, 'vx', true);
+    if (Math.abs(vyt) > 1e-6) arrow(ctx, px, py, px, py - vyt * k, C.apple, 'vy', true);
+    arrow(ctx, px, py, px + R.vx * k, py - vyt * k, C.leaf, 'v');
+  }
+},
+{
+  id: 'mcu', grupo: 'Cinemática', nome: 'MCU e polias acopladas',
+  desc: 'Polias girando com velocidade constante. Calcula frequência, período, velocidade angular e linear na transmissão.',
+  leis: ['1ª Lei'], bodies: 0, noMass: true, bodyLabels: [], def: [], anim: true,
+  inputs: [
+    {id: 'modo', label: 'Tipo de acoplamento', type: 'select', val: 'correia', options: [['correia', 'Polias ligadas por correia'], ['eixo', 'Polias no mesmo eixo']]},
+    {id: 'R1', label: 'Raio da polia 1 (motora)', unit: 'm', min: 1e-6, val: 0.1},
+    {id: 'R2', label: 'Raio da polia 2', unit: 'm', min: 1e-6, val: 0.3},
+    {id: 'f1', label: 'Frequência da polia 1', unit: 'rpm', min: 1e-6, val: 1200}
+  ],
+  compute: s => {
+    const f1 = s.f1 / 60, w1 = 2 * Math.PI * f1, v1 = w1 * s.R1, belt = s.modo === 'correia';
+    const w2 = belt ? v1 / s.R2 : w1, v2 = belt ? v1 : w2 * s.R2, f2 = w2 / (2 * Math.PI);
+    return {belt, f1, w1, v1, w2, v2, f2, T1: 1 / f1, T2: 1 / f2, a1: v1 * v1 / s.R1, a2: v2 * v2 / s.R2};
+  },
+  results: (s, R) => [['Frequência da polia 2', `${auto(R.f2 * 60)} rpm (${auto(R.f2)} Hz)`, '', 1], ['Velocidade angular ω₁ | ω₂', `${auto(R.w1)} | ${auto(R.w2)}`, 'rad/s'], ['Velocidade linear na borda v₁ | v₂', `${auto(R.v1)} | ${auto(R.v2)}`, 'm/s', 1], ['Período T₁ | T₂', `${auto(R.T1)} | ${auto(R.T2)}`, 's'], ['Aceleração centrípeta na borda a₁ | a₂', `${auto(R.a1)} | ${auto(R.a2)}`, 'm/s²']],
+  steps: (s, R) => li('Frequência da polia 1 em hertz:', [`f₁ = ${num(s.f1)} rpm / 60 = ${auto(R.f1)} Hz`, `T₁ = 1 / f₁ = ${auto(R.T1)} s`])
+    + li('Velocidades da polia 1:', [`ω₁ = 2π·f₁ = ${auto(R.w1)} rad/s`, `v₁ = ω₁·R₁ = ${auto(R.w1)} × ${num(s.R1)} = ${auto(R.v1)} m/s`])
+    + (R.belt
+      ? li('Correia sem deslizar: mesma velocidade linear nas bordas.', [`v₂ = v₁ = ${auto(R.v2)} m/s`, `ω₂ = v₂ / R₂ = ${auto(R.w2)} rad/s`, `f₁·R₁ = f₂·R₂ ⇒ f₂ = ${num(s.f1)} × ${num(s.R1)} / ${num(s.R2)} = ${auto(R.f2 * 60)} rpm`], 'A polia maior gira mais devagar.')
+      : li('Mesmo eixo: mesma velocidade angular e mesma frequência.', [`ω₂ = ω₁ = ${auto(R.w2)} rad/s  |  f₂ = f₁ = ${auto(R.f2 * 60)} rpm`, `v₂ = ω₂·R₂ = ${auto(R.v2)} m/s`], 'A borda da polia maior anda mais rápido.'))
+    + li('Aceleração centrípeta na borda:', [`a = v² / R ⇒ a₁ = ${auto(R.a1)} m/s², a₂ = ${auto(R.a2)} m/s²`]),
+  notes: 'Mesmo com velocidade constante em módulo, o MCU tem aceleração (centrípeta), porque a direção da velocidade muda o tempo todo.',
+  enun: s => s.modo === 'correia' ? `Duas polias de raios ${num(s.R1)} m e ${num(s.R2)} m estão ligadas por uma correia que não desliza. A polia menor gira a ${num(s.f1)} rpm. Determine a frequência da outra polia e a velocidade linear da correia.` : `Duas polias de raios ${num(s.R1)} m e ${num(s.R2)} m estão fixas no mesmo eixo, que gira a ${num(s.f1)} rpm. Determine a velocidade angular do conjunto e a velocidade linear na borda de cada polia.`,
+  dur: () => 12,
+  draw(ctx, w, h, s, R, an){
+    const rmax = Math.min(h * .3, w * .17), k = rmax / Math.max(s.R1, s.R2), r1 = Math.max(10, s.R1 * k), r2 = Math.max(10, s.R2 * k);
+    const wm = Math.max(R.w1, R.w2), a1 = R.w1 / wm * 3 * an.t, a2 = R.w2 / wm * 3 * an.t, cy = h * .56;
+    const wheel = (cx, r, ang, nm) => {
+      ctx.fillStyle = C.bodyA; ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.lineWidth = 1.5; ctx.beginPath(); for (let i = 0; i < 3; i++){ const q = -ang + i * 2 * Math.PI / 3; ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(q) * r, cy + Math.sin(q) * r); } ctx.stroke();
+      ctx.fillStyle = C.ink; ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI * 2); ctx.fill();
+      hand(ctx, nm, cx, cy + r + 22, C.ink, 'center', 'bottom', 17);
+    };
+    const kv = 60 / Math.max(R.v1, R.v2);
+    if (R.belt){
+      const c1 = w * .3, c2 = w * .72;
+      ctx.strokeStyle = C.brass; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(c1, cy - r1); ctx.lineTo(c2, cy - r2); ctx.moveTo(c1, cy + r1); ctx.lineTo(c2, cy + r2); ctx.stroke();
+      wheel(c1, r1, a1, 'polia 1'); wheel(c2, r2, a2, 'polia 2');
+      arrow(ctx, c1, cy - r1, c1 + R.v1 * kv, cy - r1, C.leaf, 'v₁'); arrow(ctx, c2, cy - r2, c2 + R.v2 * kv, cy - r2, C.leaf, 'v₂');
+    } else {
+      const cx = w * .45, big = r2 >= r1;
+      wheel(cx, Math.max(r1, r2), a1, ''); ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, Math.min(r1, r2), 0, Math.PI * 2); ctx.stroke();
+      arrow(ctx, cx, cy - r1, cx + R.v1 * kv, cy - r1, C.leaf, 'v₁'); arrow(ctx, cx, cy - r2, cx + R.v2 * kv, cy - r2, C.sky, 'v₂');
+      hand(ctx, big ? 'polia 2 (externa) e polia 1 (interna)' : 'polia 1 (externa) e polia 2 (interna)', cx, cy + Math.max(r1, r2) + 24, C.ink, 'center');
+    }
+    caption(ctx, w, an.t === 0 ? 'Toque em Simular para girar.' : (R.belt ? 'Correia: mesma velocidade linear v.' : 'Mesmo eixo: mesma velocidade angular ω.'));
+  }
+},
+/* ---------- DINÂMICA (novos) ---------- */
+{
+  id: 'polias', grupo: 'Dinâmica', nome: 'Polias: Atwood e bloco na mesa',
+  desc: 'Corpos ligados por fio que passa numa polia ideal. Calcula aceleração e tração.',
+  leis: ['2ª Lei', '3ª Lei'], bodies: 2, bodyLabels: ['Corpo A (à esquerda ou sobre a mesa)', 'Corpo B (à direita, pendurado)'], def: ['bloco', 'bloco'], allow: LIFT, anim: true,
+  inputs: [
+    {id: 'modo', label: 'Montagem', type: 'select', val: 'atwood', options: [['atwood', 'Máquina de Atwood (os dois pendurados)'], ['mesa', 'A sobre a mesa, B pendurado']]},
+    {id: 'mu', label: 'Atrito entre A e a mesa μ', unit: '', min: 0, max: 2, val: 0.2, show: s => s.modo === 'mesa'}
+  ],
+  defaults: s => { if (s.m1 === s.m2) s.m2 = nice(s.m1 * 1.5); },
+  compute: s => {
+    const M = s.m1 + s.m2, PA = s.m1 * G, PB = s.m2 * G;
+    if (s.modo === 'atwood'){
+      const a = Math.abs(s.m2 - s.m1) * G / M, T = 2 * s.m1 * s.m2 * G / M;
+      return {M, PA, PB, a, T, moves: a > 1e-12, dir: Math.sign(s.m2 - s.m1)};
+    }
+    const Fat = s.mu * PA, moves = PB > Fat + 1e-9, a = moves ? (PB - Fat) / M : 0;
+    return {M, PA, PB, Fat, a, T: moves ? s.m1 * a + Fat : PB, moves, dir: 1};
+  },
+  results: (s, R) => [['Aceleração', auto(R.a), 'm/s²', 1], ['Tração no fio', auto(R.T), 'N', 1], ['Peso de A | B', `${auto(R.PA)} | ${auto(R.PB)}`, 'N'], ['Sentido', !R.moves ? 'em repouso' : s.modo === 'mesa' ? 'B desce, A avança' : (R.dir > 0 ? 'B desce, A sobe' : 'A desce, B sobe'), '']],
+  steps: (s, R) => {
+    if (s.modo === 'atwood') return li('Pesos:', [`PA = ${num(s.m1)} × ${num(G)} = ${auto(R.PA)} N`, `PB = ${num(s.m2)} × ${num(G)} = ${auto(R.PB)} N`])
+      + li('Sistema todo (a tração é interna):', [`|PB − PA| = (mA + mB)·a`, `a = |${auto(R.PB)} − ${auto(R.PA)}| / ${num(R.M)} = ${auto(R.a)} m/s²`], R.moves ? 'O corpo mais pesado desce.' : 'Massas iguais: equilíbrio (1ª Lei).')
+      + li('Isolando um dos corpos para achar a tração:', [`T = 2·mA·mB·g / (mA + mB) = 2 × ${num(s.m1)} × ${num(s.m2)} × ${num(G)} / ${num(R.M)} = ${auto(R.T)} N`]);
+    let h = li('Força que puxa o sistema (peso de B) e atrito em A:', [`PB = ${num(s.m2)} × ${num(G)} = ${auto(R.PB)} N`, `Fat = μ·mA·g = ${num(s.mu)} × ${num(s.m1)} × ${num(G)} = ${auto(R.Fat)} N`])
+      + li('Verificação:', [`PB ${R.moves ? '>' : '≤'} Fat,máx`], R.moves ? 'O sistema entra em movimento.' : 'O sistema fica parado e T = PB.');
+    if (R.moves) h += li('Sistema todo:', [`PB − Fat = (mA + mB)·a ⇒ a = (${auto(R.PB)} − ${auto(R.Fat)}) / ${num(R.M)} = ${auto(R.a)} m/s²`])
+      + li('Isolando A (na mesa):', [`T − Fat = mA·a ⇒ T = ${num(s.m1)} × ${auto(R.a)} + ${auto(R.Fat)} = ${auto(R.T)} N`])
+      + li('Conferência em B:', [`PB − T = ${auto(R.PB - R.T)} N = mB·a = ${auto(s.m2 * R.a)} N ✓`]);
+    return h;
+  },
+  notes: 'A polia ideal só muda a direção do fio; a tração é a mesma dos dois lados. O fio puxa cada corpo com T: par ação e reação transmitido pelo fio.',
+  enun: s => s.modo === 'atwood' ? `Numa máquina de Atwood, ${btxt(s, 1)} de ${num(s.m1)} kg (A) e ${btxt(s, 2)} de ${num(s.m2)} kg (B) estão pendurados nas extremidades de um fio ideal que passa por uma polia ideal. Considerando g = ${num(G)} m/s², determine a aceleração do sistema e a tração no fio.` : `${cap(btxt(s, 1))} de ${num(s.m1)} kg (A) está sobre uma mesa horizontal com coeficiente de atrito ${num(s.mu)} e ligad${o(s, 1)}, por um fio ideal que passa por uma polia na borda da mesa, a ${btxt(s, 2)} de ${num(s.m2)} kg (B) pendurad${o(s, 2)}. Considerando g = ${num(G)} m/s², determine a aceleração do sistema e a tração no fio.`,
+  dur: () => 2,
+  draw(ctx, w, h, s, R, an){
+    const t = an.t, D = h * .2, d = R.moves ? Math.min(D, D * t * t / 4) : 0;
+    const sA = fitS(s.b1, w * .14, h * .16), sB = fitS(s.b2, w * .14, h * .16), L = forceLen(h, Math.max(R.PA, R.PB, R.T));
+    if (s.modo === 'atwood'){
+      hatchTop(ctx, w / 2 - 60, w / 2 + 60, 18);
+      const pr = Math.max(22, Math.max(DIM[s.b1][0] * sA, DIM[s.b2][0] * sB) / 2 + 8), cx = w / 2, cy = 52;
+      ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx, 18); ctx.lineTo(cx, cy); ctx.stroke();
+      ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, pr, 0, Math.PI * 2); ctx.stroke();
+      const base = h * .66, yA = base - R.dir * d, yB = base + R.dir * d;
+      const hA = DIM[s.b1][1] * sA, hB = DIM[s.b2][1] * sB;
+      ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx - pr, cy); ctx.lineTo(cx - pr, yA - hA); ctx.moveTo(cx + pr, cy); ctx.lineTo(cx + pr, yB - hB); ctx.stroke();
+      drawBody(ctx, s.b1, cx - pr, yA, sA, C.bodyA); drawBody(ctx, s.b2, cx + pr, yB, sB, C.bodyB);
+      hand(ctx, 'A', cx - pr - DIM[s.b1][0] * sA / 2 - 10, yA - hA / 2, C.ink, 'right', 'middle', 18);
+      hand(ctx, 'B', cx + pr + DIM[s.b2][0] * sB / 2 + 10, yB - hB / 2, C.ink, 'left', 'middle', 18);
+      arrow(ctx, cx - pr - 14, yA - hA, cx - pr - 14, yA - hA - L(R.T), C.sky, 'T'); arrow(ctx, cx + pr + 14, yB - hB, cx + pr + 14, yB - hB - L(R.T), C.sky, 'T');
+      arrow(ctx, cx - pr, yA, cx - pr, yA + L(R.PA), C.weight, 'PA'); arrow(ctx, cx + pr, yB, cx + pr, yB + L(R.PB), C.weight, 'PB');
+    } else {
+      const ty = h * .48, tx = w * .62, pr = 13, pcx = tx, pcy = ty - pr;
+      ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, ty); ctx.lineTo(tx, ty); ctx.moveTo(tx - 20, ty); ctx.lineTo(tx - 20, h); ctx.stroke();
+      ctx.beginPath(); ctx.arc(pcx, pcy, pr, 0, Math.PI * 2); ctx.stroke();
+      const wA = DIM[s.b1][0] * sA, xA = w * .22 + d * 1.2;
+      const bA = drawBody(ctx, s.b1, xA, ty, sA, C.bodyA), ry = pcy - pr;
+      ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(xA + wA / 2, Math.max(ry, ty - bA.h + 2)); ctx.lineTo(pcx, ry); ctx.stroke();
+      const hB = DIM[s.b2][1] * sB, yBt = ty + 30 + d;
+      ctx.beginPath(); ctx.moveTo(pcx + pr, pcy); ctx.lineTo(pcx + pr, yBt); ctx.stroke();
+      drawBody(ctx, s.b2, pcx + pr, yBt + hB, sB, C.bodyB);
+      hand(ctx, 'A', xA, ty - bA.h - 6, C.ink, 'center', 'bottom', 18); hand(ctx, 'B', pcx + pr + DIM[s.b2][0] * sB / 2 + 10, yBt + hB / 2, C.ink, 'left', 'middle', 18);
+      arrow(ctx, xA - wA / 2, ty - 5, xA - wA / 2 - L(R.Fat || 0), ty - 5, C.brass, 'Fat');
+      arrow(ctx, pcx + pr + 14, yBt, pcx + pr + 14, yBt - L(R.T), C.sky, 'T');
+      arrow(ctx, pcx + pr, yBt + hB, pcx + pr, yBt + hB + Math.min(L(R.PB), h - yBt - hB - 6), C.weight, 'PB');
+    }
+    caption(ctx, w, R.moves ? `a = ${auto(R.a)} m/s²  |  T = ${auto(R.T)} N` : 'Sistema em equilíbrio.', w * .4);
+  }
+},
+{
+  id: 'elevador', grupo: 'Dinâmica', nome: 'Elevador e peso aparente',
+  desc: 'Pessoa sobre uma balança dentro de um elevador acelerado. Calcula a normal e quanto a balança marca.',
+  leis: ['2ª Lei', '3ª Lei'], bodies: 1, bodyLabels: ['Corpo sobre a balança'], def: ['pessoa'], allow: LIFT,
+  inputs: [{id: 'a', label: 'Aceleração do elevador', unit: 'm/s²', val: 2, hint: 'Positiva para cima (sobe acelerando ou desce freando). Negativa para baixo (desce acelerando ou sobe freando).'}],
+  compute: s => { const P = s.m1 * G, Nr = s.m1 * (G + s.a), N = Math.max(0, Nr); return {P, N, lost: Nr < 0, ap: N / G}; },
+  results: (s, R) => [['Peso real', auto(R.P), 'N'], ['Normal (peso aparente)', auto(R.N), 'N', 1], ['A balança marca', auto(R.ap), 'kg', 1], ['Sensação', R.lost ? 'perde contato com o piso' : R.N > R.P + 1e-9 ? 'mais pesado' : R.N < R.P - 1e-9 ? (R.N === 0 ? 'imponderabilidade' : 'mais leve') : 'peso normal', '']],
+  steps: (s, R) => li('Forças na pessoa: peso (para baixo) e normal da balança (para cima).', [`P = m·g = ${num(s.m1)} × ${num(G)} = ${auto(R.P)} N`])
+    + li('2ª Lei na vertical, positivo para cima:', [`N − P = m·a ⇒ N = m·(g + a)`, `N = ${num(s.m1)} × (${num(G)} + ${num(s.a)}) = ${auto(s.m1 * (G + s.a))} N`], R.lost ? 'N negativa é impossível: a pessoa perde contato com o piso (a < −g).' : '')
+    + li('A balança é calibrada para mostrar N/g:', [`leitura = N / g = ${auto(R.N)} / ${num(G)} = ${auto(R.ap)} kg`]),
+  notes: 'A balança mede a normal, não o peso. Pela 3ª Lei, a pessoa empurra a balança com a mesma força N. Em queda livre (a = −g), N = 0: imponderabilidade.',
+  enun: s => `${cap(btxt(s, 1))} de massa ${num(s.m1)} kg está sobre uma balança dentro de um elevador que tem aceleração de ${num(Math.abs(s.a))} m/s² ${s.a >= 0 ? 'para cima' : 'para baixo'}. Considerando g = ${num(G)} m/s², determine a força normal e a indicação da balança.`,
+  draw(ctx, w, h, s, R){
+    const cw = Math.min(w * .4, 210), ch = h * .7, cx = w * .42, top = h * .16, x1 = cx - cw / 2;
+    dashLine(ctx, x1 - 18, 0, x1 - 18, h); dashLine(ctx, x1 + cw + 18, 0, x1 + cw + 18, h);
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, top); ctx.stroke();
+    ctx.lineWidth = 2.5; ctx.strokeRect(x1, top, cw, ch);
+    const fy = top + ch - 6; ctx.lineWidth = 2; ctx.strokeRect(cx - 32, fy - 8, 64, 8);
+    const b = drawBody(ctx, s.b1, cx, fy - 8, fitS(s.b1, cw * .4, ch * .5), C.bodyA), cy = fy - 8 - b.h / 2;
+    const L = forceLen(h, Math.max(R.P, R.N));
+    arrow(ctx, cx - 6, cy, cx - 6, cy + L(R.P), C.weight, 'P'); arrow(ctx, cx + 6, cy, cx + 6, cy - L(R.N), C.sky, 'N');
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5; ctx.strokeRect(x1 + 10, top + 10, 92, 30);
+    hand(ctx, `${fmt(R.ap, 1)} kg`, x1 + 56, top + 36, C.brass, 'center', 'bottom', 18);
+    const ax = x1 + cw + 46, ay = top + ch / 2;
+    if (Math.abs(s.a) > 1e-9) arrow(ctx, ax, ay, ax, ay - clamp(s.a / G * 70, -80, 80), C.leaf, 'a'); else hand(ctx, 'a = 0', ax, ay, C.leaf, 'center', 'middle');
+  }
+},
+{
+  id: 'hooke', grupo: 'Dinâmica', nome: 'Força elástica (Lei de Hooke)',
+  desc: 'Corpo pendurado em mola, sozinha ou em associação. Calcula a constante equivalente e a deformação.',
+  leis: ['1ª Lei', '3ª Lei'], bodies: 1, bodyLabels: ['Corpo pendurado'], def: ['bloco'], allow: LIFT,
+  inputs: [
+    {id: 'assoc', label: 'Molas', type: 'select', val: 'unica', options: [['unica', 'Uma mola (k₁)'], ['serie', 'Duas molas em série'], ['paralelo', 'Duas molas em paralelo']]},
+    {id: 'k1', label: 'Constante elástica k₁', unit: 'N/m', min: 1e-6},
+    {id: 'k2', label: 'Constante elástica k₂', unit: 'N/m', min: 1e-6, show: s => s.assoc !== 'unica'}
+  ],
+  defaults: s => { s.k1 = nice(s.m1 * G / 0.2); s.k2 = nice(s.k1 * 1.5); },
+  compute: s => {
+    const keq = s.assoc === 'serie' ? s.k1 * s.k2 / (s.k1 + s.k2) : s.assoc === 'paralelo' ? s.k1 + s.k2 : s.k1;
+    const F = s.m1 * G, x = F / keq;
+    return {keq, F, x, E: keq * x * x / 2, x1: F / s.k1, x2: F / s.k2, F1: s.k1 * x, F2: s.k2 * x};
+  },
+  results: (s, R) => [['Constante equivalente', auto(R.keq), 'N/m'], ['Força elástica (= peso no equilíbrio)', auto(R.F), 'N'], ['Deformação total', `${auto(R.x)} m (${auto(R.x * 100)} cm)`, '', 1], ['Energia elástica armazenada', auto(R.E), 'J']],
+  steps: (s, R) => {
+    let h = li('No equilíbrio, a força elástica equilibra o peso (1ª Lei):', [`Fel = P = m·g = ${num(s.m1)} × ${num(G)} = ${auto(R.F)} N`]);
+    if (s.assoc === 'serie') h += li('Em série, cada mola sente a força toda e as deformações se somam:', [`1/keq = 1/k₁ + 1/k₂ ⇒ keq = k₁·k₂ / (k₁ + k₂) = ${auto(R.keq)} N/m`, `x₁ = F/k₁ = ${auto(R.x1)} m  |  x₂ = F/k₂ = ${auto(R.x2)} m`]);
+    else if (s.assoc === 'paralelo') h += li('Em paralelo, a deformação é a mesma e as forças se somam:', [`keq = k₁ + k₂ = ${num(s.k1)} + ${num(s.k2)} = ${auto(R.keq)} N/m`, `F₁ = k₁·x = ${auto(R.F1)} N  |  F₂ = k₂·x = ${auto(R.F2)} N`]);
+    else h += li('Uma só mola:', [`keq = k₁ = ${num(s.k1)} N/m`]);
+    return h + li('Lei de Hooke:', [`Fel = k·x ⇒ x = F / keq = ${auto(R.F)} / ${auto(R.keq)} = ${auto(R.x)} m`])
+      + li('Energia potencial elástica:', [`Epel = k·x²/2 = ${auto(R.keq)} × ${auto(R.x)}² / 2 = ${auto(R.E)} J`]);
+  },
+  notes: 'Em série a associação fica mais "mole" (keq menor que a menor k); em paralelo, mais "dura" (keq maior). A mola puxa o corpo para cima e o corpo puxa a mola para baixo: par ação e reação.',
+  enun: s => `${cap(btxt(s, 1))} de massa ${num(s.m1)} kg está em equilíbrio, pendurad${o(s, 1)} ${s.assoc === 'unica' ? `em uma mola de constante ${num(s.k1)} N/m` : `em duas molas associadas em ${s.assoc === 'serie' ? 'série' : 'paralelo'}, de constantes ${num(s.k1)} N/m e ${num(s.k2)} N/m`}. Considerando g = ${num(G)} m/s², determine a constante elástica equivalente e a deformação do sistema.`,
+  draw(ctx, w, h, s, R){
+    const cx = w * .42, top = 26, L0 = h * .2, ext = h * .3 * R.x / (R.x + .25), sz = fitS(s.b1, w * .18, h * .2);
+    hatchTop(ctx, cx - 80, cx + 80, top);
+    let yb;
+    if (s.assoc === 'serie'){
+      const e1 = ext * R.x1 / R.x, e2 = ext * R.x2 / R.x, m = top + L0 / 2 + e1;
+      spring(ctx, cx, top, m, 10, 8); ctx.fillStyle = C.ink; ctx.fillRect(cx - 4, m - 2, 8, 4);
+      spring(ctx, cx, m, m + L0 / 2 + e2, 10, 8); yb = m + L0 / 2 + e2;
+      hand(ctx, 'k₁', cx + 16, top + (m - top) / 2, C.muted, 'left', 'middle'); hand(ctx, 'k₂', cx + 16, m + (yb - m) / 2, C.muted, 'left', 'middle');
+    } else if (s.assoc === 'paralelo'){
+      yb = top + L0 + ext;
+      spring(ctx, cx - 26, top, yb - 6, 9, 10); spring(ctx, cx + 26, top, yb - 6, 9, 10);
+      ctx.strokeStyle = C.ink; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(cx - 34, yb - 6); ctx.lineTo(cx + 34, yb - 6); ctx.stroke();
+      ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx, yb - 6); ctx.lineTo(cx, yb); ctx.stroke();
+      hand(ctx, 'k₁', cx - 44, top + L0 / 2, C.muted, 'right', 'middle'); hand(ctx, 'k₂', cx + 44, top + L0 / 2, C.muted, 'left', 'middle');
+    } else { yb = top + L0 + ext; spring(ctx, cx, top, yb, 10, 12); }
+    const hb = DIM[s.b1][1] * sz, b = drawBody(ctx, s.b1, cx, yb + hb, sz, C.bodyA);
+    const nat = top + L0;
+    dashLine(ctx, cx + 60, nat, cx + 130, nat); dashLine(ctx, cx + 60, yb, cx + 130, yb, C.brass);
+    arrow(ctx, cx + 110, nat, cx + 110, yb, C.brass, ''); hand(ctx, `x = ${auto(R.x * 100)} cm`, cx + 136, (nat + yb) / 2 + 6, C.brass);
+    hand(ctx, 'comprimento natural', cx + 136, nat + 6, C.muted, 'left', 'bottom', 13);
+    const L = Math.min(70, h * .18), cyb = yb + hb / 2;
+    arrow(ctx, cx - b.w / 2 - 14, cyb, cx - b.w / 2 - 14, cyb - L, C.apple, 'Fel'); arrow(ctx, cx + b.w / 2 + 14, cyb, cx + b.w / 2 + 14, Math.min(h - 6, cyb + L), C.weight, 'P');
+  }
+},
+{
+  id: 'looping', grupo: 'Dinâmica', nome: 'Looping (globo da morte)',
+  desc: 'Corpo percorrendo um looping vertical. Calcula a velocidade mínima no topo e a normal no topo e embaixo.',
+  leis: ['1ª Lei', '2ª Lei'], bodies: 1, bodyLabels: ['Corpo'], def: ['carro'], allow: NO_PROJ,
+  inputs: [
+    {id: 'R', label: 'Raio do looping R', unit: 'm', min: 1e-6, val: 5},
+    {id: 'v', label: 'Velocidade no topo', unit: 'm/s', min: 0, val: 10}
+  ],
+  compute: s => {
+    const vmin = Math.sqrt(G * s.R), falls = s.v < vmin - 1e-9, P = s.m1 * G, Fc = s.m1 * s.v * s.v / s.R, Nt = Fc - P;
+    const vb = Math.sqrt(s.v * s.v + 4 * G * s.R), Nb = s.m1 * vb * vb / s.R + P;
+    return {vmin, falls, P, Fc, Nt, vb, Nb};
+  },
+  results: (s, R) => [['Velocidade mínima no topo', `${auto(R.vmin)} (${auto(R.vmin * 3.6)} km/h)`, 'm/s', 1], ['Normal no topo', R.falls ? 'não há contato' : auto(R.Nt), R.falls ? '' : 'N', 1], ['Velocidade no ponto mais baixo', auto(R.vb), 'm/s'], ['Normal no ponto mais baixo', auto(R.Nb), 'N'], ['Situação', R.falls ? 'perde contato no topo' : 'completa o looping', '']],
+  steps: (s, R) => li('No topo, peso e normal apontam para o centro; juntos formam a centrípeta:', [`N + P = m·v² / R`])
+    + li('Normal no topo:', [`N = m·v²/R − m·g = ${num(s.m1)} × ${num(s.v)}² / ${num(s.R)} − ${auto(R.P)} = ${auto(R.Nt)} N`], R.falls ? 'N negativa: a pista não consegue segurar, o corpo perde contato.' : '')
+    + li('Velocidade mínima no topo (N = 0, só o peso faz a centrípeta):', [`m·g = m·v²/R ⇒ v_mín = √(g·R) = √(${num(G)} × ${num(s.R)}) = ${auto(R.vmin)} m/s`], 'A massa se cancela.')
+    + li('No ponto mais baixo (conservação de energia, desnível 2R):', [`v_b² = v² + 2·g·(2R) ⇒ v_b = ${auto(R.vb)} m/s`, `N − P = m·v_b²/R ⇒ N = ${auto(R.Nb)} N`]),
+  notes: 'Abaixo da velocidade mínima, falta força para o centro e o corpo tende a seguir em linha reta (1ª Lei), descolando da pista.',
+  enun: s => `${cap(btxt(s, 1))} de massa ${num(s.m1)} kg percorre um looping vertical de raio ${num(s.R)} m, passando pelo ponto mais alto com velocidade de ${num(s.v)} m/s. Desprezando atritos e considerando g = ${num(G)} m/s², determine a velocidade mínima no topo, a força normal no topo e a força normal no ponto mais baixo.`,
+  draw(ctx, w, h, s, R){
+    const cx = w * .45, cy = h * .52, r = Math.min(w, h) * .36;
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = C.ink; ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI * 2); ctx.fill(); hand(ctx, `R = ${num(s.R)} m`, cx + 8, cy - 4, C.muted);
+    const sz = fitS(s.b1, r * .5, r * .26), bh = DIM[s.b1][1] * sz, L = forceLen(h * .8, Math.max(R.P, R.Nb, Math.abs(R.Nt)));
+    ctx.save(); ctx.translate(cx, cy - r); ctx.rotate(Math.PI); drawBody(ctx, s.b1, 0, 0, sz, C.bodyA); ctx.restore();
+    const ct = cy - r + bh / 2;
+    arrow(ctx, cx - 8, ct, cx - 8, ct + L(R.P), C.weight, 'P');
+    if (!R.falls) arrow(ctx, cx + 8, ct, cx + 8, ct + L(R.Nt), C.sky, 'N');
+    arrow(ctx, cx, ct - bh / 2 - 4, cx - 50, ct - bh / 2 - 4, C.leaf, 'v');
+    ctx.globalAlpha = .55; drawBody(ctx, s.b1, cx, cy + r, sz, C.bodyA); ctx.globalAlpha = 1;
+    const cb = cy + r - bh / 2;
+    arrow(ctx, cx - 8, cb, cx - 8, cb + Math.min(L(R.P), 20), C.weight, ''); arrow(ctx, cx + 8, cb, cx + 8, cb - L(R.Nb), C.sky, 'N');
+    caption(ctx, w, R.falls ? 'Abaixo de v mínima: perde contato no topo.' : 'No topo, P e N apontam para o centro.', w * .45);
+  }
+},
+/* ---------- TRABALHO E ENERGIA (novos) ---------- */
+{
+  id: 'trabalho', grupo: 'Trabalho e energia', nome: 'Trabalho de uma força',
+  desc: 'Uma força puxa um corpo por uma distância. Calcula o trabalho de cada força e a velocidade final pelo teorema trabalho-energia.',
+  leis: ['2ª Lei'], bodies: 1, bodyLabels: ['Corpo'], def: ['bloco'], allow: NO_PROJ,
+  inputs: [
+    {id: 'F', label: 'Força aplicada F', unit: 'N', min: 0},
+    {id: 'ang', label: 'Ângulo entre F e o deslocamento', unit: '°', min: 0, max: 90, val: 30},
+    {id: 'd', label: 'Deslocamento d', unit: 'm', min: 0, val: 10},
+    {id: 'mu', label: 'Coeficiente de atrito μ', unit: '', min: 0, max: 2, val: 0.1},
+    {id: 'v0', label: 'Velocidade inicial', unit: 'm/s', min: 0, val: 0}
+  ],
+  defaults: s => { s.F = nice(0.5 * s.m1 * G); },
+  check: s => s.F * Math.sin(s.ang * D2R) > s.m1 * G + 1e-9 ? 'A componente vertical da força supera o peso: o corpo sairia do chão. Reduza F ou o ângulo.' : null,
+  compute: s => {
+    const th = s.ang * D2R, Fx = s.F * Math.cos(th), Fy = s.F * Math.sin(th), N = s.m1 * G - Fy, Fat = s.mu * N;
+    const WF = Fx * s.d, Wat = -Fat * s.d, Wt = WF + Wat, Ec0 = s.m1 * s.v0 * s.v0 / 2, Ecf = Ec0 + Wt;
+    return {th, Fx, Fy, N, Fat, WF, Wat, Wt, Ec0, Ecf, vf: Ecf > 0 ? Math.sqrt(2 * Ecf / s.m1) : 0, stops: Ecf < 0};
+  },
+  results: (s, R) => [['Trabalho da força F', auto(R.WF), 'J', 1], ['Trabalho do atrito', auto(R.Wat), 'J'], ['Trabalho do peso e da normal', '0', 'J'], ['Trabalho total', auto(R.Wt), 'J', 1], ['Velocidade ao fim do deslocamento', R.stops ? 'para antes' : auto(R.vf), R.stops ? '' : 'm/s', 1]],
+  steps: (s, R) => li('Trabalho de força constante:', [`W = F·d·cos θ = ${num(s.F)} × ${num(s.d)} × cos ${num(s.ang)}° = ${auto(R.WF)} J`], 'Só a componente na direção do deslocamento realiza trabalho.')
+    + li('Normal reduzida pela componente vertical de F:', [`N = P − F·sen θ = ${auto(s.m1 * G)} − ${auto(R.Fy)} = ${auto(R.N)} N`])
+    + li('Atrito e seu trabalho (θ = 180°, contrário ao movimento):', [`Fat = μ·N = ${num(s.mu)} × ${auto(R.N)} = ${auto(R.Fat)} N`, `W_at = −Fat·d = ${auto(R.Wat)} J`])
+    + li('Peso e normal são perpendiculares ao deslocamento:', ['W_P = W_N = 0'])
+    + li('Teorema trabalho-energia (vem da 2ª Lei):', [`W_total = ΔEc ⇒ ${auto(R.Wt)} = Ec_f − ${auto(R.Ec0)}`, `Ec_f = ${auto(R.Ecf)} J ⇒ v = √(2·Ec_f / m) = ${R.stops ? '—' : auto(R.vf) + ' m/s'}`], R.stops ? 'Ec final negativa: o corpo para antes de completar o deslocamento.' : ''),
+  notes: 'Trabalho positivo fornece energia ao corpo; trabalho negativo (atrito) retira. Força perpendicular ao movimento não realiza trabalho.',
+  enun: s => `${cap(mtxt(s, 1))}, ${s.v0 > 0 ? `com velocidade inicial de ${num(s.v0)} m/s` : 'inicialmente em repouso'}, é puxad${o(s, 1)} por uma força de ${num(s.F)} N que forma ${num(s.ang)}° com a horizontal, ao longo de ${num(s.d)} m de um piso com coeficiente de atrito ${num(s.mu)}. Considerando g = ${num(G)} m/s², determine o trabalho de cada força, o trabalho total e a velocidade ao final do deslocamento.`,
+  draw(ctx, w, h, s, R){
+    const gy = h * .64, x = w * .34;
+    floor(ctx, w, h, gy, s.mu > 0 ? C.brass : null, Math.min(.35, s.mu * .4));
+    const b = drawBody(ctx, s.b1, x, gy, fitS(s.b1, w * .22, h * .26), C.bodyA), cy = gy - b.h / 2;
+    const L = forceLen(h, Math.max(s.m1 * G, s.F));
+    arrow(ctx, x, cy, x + Math.cos(R.th) * L(s.F), cy - Math.sin(R.th) * L(s.F), C.apple, 'F');
+    if (s.ang > 0){ ctx.strokeStyle = C.apple; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x, cy, 28, -R.th, 0); ctx.stroke(); hand(ctx, `${num(s.ang)}°`, x + 32, cy - 4, C.apple); dashLine(ctx, x, cy, x + 70, cy); }
+    arrow(ctx, x, cy, x, cy + L(s.m1 * G), C.weight, 'P'); arrow(ctx, x - 10, cy, x - 10, cy - L(R.N), C.sky, 'N');
+    if (R.Fat > 0) arrow(ctx, x - b.w / 2, gy - 5, x - b.w / 2 - L(R.Fat), gy - 5, C.brass, 'Fat');
+    arrow(ctx, x - b.w / 2, gy + 26, Math.min(w - 20, x + w * .45), gy + 26, C.leaf, '');
+    hand(ctx, `d = ${num(s.d)} m`, x, gy + 48, C.leaf, 'left', 'bottom');
+    caption(ctx, w, `W total = ${auto(R.Wt)} J`);
+  }
+},
+{
+  id: 'potencia', grupo: 'Trabalho e energia', nome: 'Potência e rendimento',
+  desc: 'Um motor ergue uma carga com velocidade constante. Calcula trabalho, potência útil, potência consumida e perdas.',
+  leis: ['1ª Lei'], bodies: 1, bodyLabels: ['Carga erguida'], def: ['bloco'], allow: NO_PROJ, anim: true,
+  inputs: [
+    {id: 'hh', label: 'Altura de elevação', unit: 'm', min: 0, val: 10},
+    {id: 't', label: 'Tempo gasto', unit: 's', min: 1e-6, val: 20},
+    {id: 'eta', label: 'Rendimento do motor', unit: '%', min: 1e-6, max: 100, val: 80}
+  ],
+  compute: s => { const W = s.m1 * G * s.hh, Pu = W / s.t, Pt = Pu / (s.eta / 100); return {W, Pu, Pt, Pd: Pt - Pu, v: s.hh / s.t, Wt: Pt * s.t}; },
+  results: (s, R) => [['Trabalho útil', auto(R.W), 'J'], ['Potência útil', auto(R.Pu), 'W', 1], ['Potência consumida', `${auto(R.Pt)} W (${auto(R.Pt / 735.5)} cv)`, '', 1], ['Potência dissipada', auto(R.Pd), 'W'], ['Energia consumida no total', auto(R.Wt), 'J'], ['Velocidade de subida', auto(R.v), 'm/s']],
+  steps: (s, R) => li('Subida com velocidade constante: a força do cabo equilibra o peso (1ª Lei).', [`T = P = m·g = ${auto(s.m1 * G)} N`])
+    + li('Trabalho útil (ganho de energia potencial):', [`W = m·g·h = ${num(s.m1)} × ${num(G)} × ${num(s.hh)} = ${auto(R.W)} J`])
+    + li('Potência útil:', [`Pu = W / Δt = ${auto(R.W)} / ${num(s.t)} = ${auto(R.Pu)} W`, `ou Pu = F·v = ${auto(s.m1 * G)} × ${auto(R.v)} = ${auto(R.Pu)} W ✓`])
+    + li('Rendimento:', [`η = Pu / Pt ⇒ Pt = ${auto(R.Pu)} / ${num(s.eta / 100)} = ${auto(R.Pt)} W`, `Pt = ${auto(R.Pt / 735.5)} cv (1 cv = 735,5 W)`])
+    + li('Potência dissipada (calor, atrito, ruído):', [`Pd = Pt − Pu = ${auto(R.Pd)} W`]),
+  notes: 'Potência é a rapidez com que se realiza trabalho. Erguer a mesma carga na metade do tempo exige o dobro da potência.',
+  enun: s => `Um motor com rendimento de ${num(s.eta)}% ergue ${mtxt(s, 1)} a uma altura de ${num(s.hh)} m, com velocidade constante, em ${num(s.t)} s. Considerando g = ${num(G)} m/s², determine a potência útil, a potência consumida pelo motor e a potência dissipada.`,
+  dur: () => 3,
+  draw(ctx, w, h, s, R, an){
+    const gy = h * .9, tx = w * .2, top = 40, bx = w * .62, p = (an.run || an.t > 0) ? Math.min(1, an.t / 3) : 0;
+    floor(ctx, w, h, gy);
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(tx, gy); ctx.lineTo(tx, top); ctx.lineTo(bx + 30, top); ctx.stroke();
+    ctx.lineWidth = 1; ctx.beginPath(); for (let y = gy; y > top + 10; y -= 18){ ctx.moveTo(tx - 8, y); ctx.lineTo(tx + 8, y - 18); } ctx.stroke();
+    ctx.lineWidth = 2; ctx.strokeRect(tx - 26, top - 4, 40, 26); hand(ctx, 'motor', tx - 6, top - 8, C.brass, 'center', 'bottom', 14);
+    const sz = fitS(s.b1, w * .2, h * .18), bh = DIM[s.b1][1] * sz, yLow = gy, yHigh = top + 60 + bh, yb = yLow - (yLow - yHigh) * p;
+    ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(bx, top); ctx.lineTo(bx, yb - bh); ctx.stroke();
+    drawBody(ctx, s.b1, bx, yb, sz, C.bodyA);
+    dashLine(ctx, bx + 50, yHigh, bx + 110, yHigh, C.brass); arrow(ctx, bx + 90, yLow, bx + 90, yHigh, C.brass, ''); hand(ctx, `h = ${num(s.hh)} m`, bx + 96, (yLow + yHigh) / 2, C.brass, 'left', 'middle');
+    caption(ctx, w, `Pu = ${auto(R.Pu)} W  |  Pt = ${auto(R.Pt)} W`, w * .6);
+  }
+},
+{
+  id: 'elastica', grupo: 'Trabalho e energia', nome: 'Energia potencial elástica',
+  desc: 'Uma mola comprimida lança um corpo sobre piso sem atrito. Calcula a energia armazenada, a velocidade de saída e até onde sobe numa rampa.',
+  leis: ['2ª Lei', '3ª Lei'], bodies: 1, bodyLabels: ['Corpo lançado'], def: ['bloco'], allow: NO_PROJ, anim: true,
+  inputs: [
+    {id: 'k', label: 'Constante elástica k', unit: 'N/m', min: 1e-6},
+    {id: 'x', label: 'Compressão da mola x', unit: 'm', min: 1e-6, val: 0.2}
+  ],
+  defaults: s => { s.k = nice(s.m1 * 500); },
+  compute: s => { const E = s.k * s.x * s.x / 2, v = s.x * Math.sqrt(s.k / s.m1); return {E, v, hmax: E / (s.m1 * G), Fmax: s.k * s.x}; },
+  results: (s, R) => [['Energia potencial elástica', auto(R.E), 'J', 1], ['Força máxima da mola', auto(R.Fmax), 'N'], ['Velocidade de saída', auto(R.v), 'm/s', 1], ['Altura máxima numa rampa sem atrito', auto(R.hmax), 'm', 1]],
+  steps: (s, R) => li('Energia armazenada na mola:', [`Epel = k·x²/2 = ${num(s.k)} × ${num(s.x)}² / 2 = ${auto(R.E)} J`])
+    + li('Sem atrito, toda a energia elástica vira cinética:', [`k·x²/2 = m·v²/2 ⇒ v = x·√(k/m) = ${num(s.x)} × √(${num(s.k)} / ${num(s.m1)}) = ${auto(R.v)} m/s`])
+    + li('Subindo a rampa, a cinética vira potencial gravitacional:', [`m·v²/2 = m·g·h ⇒ h = Epel / (m·g) = ${auto(R.E)} / (${num(s.m1)} × ${num(G)}) = ${auto(R.hmax)} m`])
+    + li('Força máxima da mola (Hooke):', [`F = k·x = ${auto(R.Fmax)} N`]),
+  notes: 'Dobrar a compressão quadruplica a energia armazenada (Epel ∝ x²) e dobra a velocidade de saída.',
+  enun: s => `${cap(mtxt(s, 1))} é encostad${o(s, 1)} em uma mola de constante ${num(s.k)} N/m, comprimida de ${num(s.x)} m, sobre um piso horizontal sem atrito. Ao ser liberado, o corpo é lançado e sobe uma rampa também sem atrito. Considerando g = ${num(G)} m/s², determine a velocidade com que o corpo deixa a mola e a altura máxima atingida na rampa.`,
+  dur: () => 3,
+  draw(ctx, w, h, s, R, an){
+    const gy = h * .78, wx = 30, sz = fitS(s.b1, w * .14, h * .16), bw = DIM[s.b1][0] * sz, Ln = w * .2, comp = Ln * .55;
+    const rx = w * .62, rang = 35 * D2R, hv = h * .4, rlen = hv / Math.sin(rang);
+    floor(ctx, w, h, gy);
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(rx, gy); ctx.lineTo(rx + Math.cos(rang) * rlen * 1.15, gy - hv * 1.15); ctx.stroke();
+    hatchTop(ctx, 0, wx, gy); ctx.beginPath(); ctx.moveTo(wx, gy); ctx.lineTo(wx, gy - h * .22); ctx.stroke();
+    dashLine(ctx, rx + Math.cos(rang) * rlen, gy - hv, w - 10, gy - hv, C.brass); hand(ctx, `h = ${auto(R.hmax)} m`, w - 12, gy - hv - 4, C.brass, 'right');
+    const t = an.t, run = an.run || t > 0;
+    let springEnd = wx + Ln - comp, bx = springEnd + bw / 2, by = gy, rot = 0;
+    if (run){
+      if (t < .4){ springEnd = wx + Ln - comp * (1 - t / .4); bx = springEnd + bw / 2; }
+      else if (t < 1.4){ springEnd = wx + Ln; bx = springEnd + bw / 2 + (rx - springEnd - bw / 2) * (t - .4); }
+      else { springEnd = wx + Ln; const f = Math.min(1, (t - 1.4) / 1.2), q = 1 - (1 - f) * (1 - f), dist = q * rlen; bx = rx + Math.cos(rang) * dist; by = gy - Math.sin(rang) * dist; rot = -rang; }
+    }
+    hspring(ctx, wx, springEnd, gy - Math.min(18, DIM[s.b1][1] * sz / 2), 9, 12);
+    ctx.save(); ctx.translate(bx, by); ctx.rotate(rot); drawBody(ctx, s.b1, 0, 0, sz, C.bodyA); ctx.restore();
+    if (!run) hand(ctx, `x = ${num(s.x)} m`, wx + (Ln - comp) / 2, gy + 22, C.muted, 'center');
+    caption(ctx, w, !run ? 'Mola comprimida. Toque em Simular.' : t < .4 ? 'Epel vira Ec.' : t < 1.4 ? `Sai com v = ${auto(R.v)} m/s.` : 'Ec vira Ep na rampa.', w * .55);
+  }
+},
+{
+  id: 'atrito_energia', grupo: 'Trabalho e energia', nome: 'Energia com atrito (dissipação)',
+  desc: 'Corpo desce uma rampa com atrito. Calcula a energia dissipada e a velocidade ao final da descida.',
+  leis: ['2ª Lei'], bodies: 1, bodyLabels: ['Corpo'], def: ['bloco'], allow: ['bloco','particula','carro','pessoa','caminhao','vagao'],
+  inputs: [
+    {id: 'hh', label: 'Altura do topo da rampa', unit: 'm', min: 1e-6, val: 5},
+    {id: 'ang', label: 'Inclinação da rampa', unit: '°', min: 1, max: 89, val: 30},
+    {id: 'mu', label: 'Coeficiente de atrito μ', unit: '', min: 0, max: 2, val: 0.2}
+  ],
+  compute: s => {
+    const th = s.ang * D2R, L = s.hh / Math.sin(th), Ei = s.m1 * G * s.hh, N = s.m1 * G * Math.cos(th), Fat = s.mu * N, Wd = Fat * L, Ef = Ei - Wd;
+    const slides = Math.tan(th) > s.mu + 1e-12;
+    return {th, L, Ei, N, Fat, Wd, Ef: Math.max(0, Ef), slides, vf: slides && Ef > 0 ? Math.sqrt(2 * Ef / s.m1) : 0, pct: Math.min(100, Wd / Ei * 100), vid: Math.sqrt(2 * G * s.hh)};
+  },
+  results: (s, R) => R.slides ? [['Energia mecânica inicial', auto(R.Ei), 'J'], ['Energia dissipada pelo atrito', `${auto(R.Wd)} J (${fmt(R.pct, 1)}%)`, '', 1], ['Energia cinética no fim', auto(R.Ef), 'J'], ['Velocidade no fim da rampa', auto(R.vf), 'm/s', 1], ['Velocidade sem atrito (comparação)', auto(R.vid), 'm/s'], ['Comprimento da rampa', auto(R.L), 'm']] : [['Situação', 'não desliza', '', 1], ['Ângulo mínimo para deslizar', auto(Math.atan(s.mu) / D2R), '°']],
+  steps: (s, R) => {
+    let h = li('Energia mecânica no topo (corpo parado):', [`Em = m·g·h = ${num(s.m1)} × ${num(G)} × ${num(s.hh)} = ${auto(R.Ei)} J`]);
+    if (!R.slides) return h + li('Verificação:', [`tg θ = ${auto(Math.tan(R.th))} ≤ μ = ${num(s.mu)}`], 'O atrito estático segura o corpo: ele não começa a descer.');
+    return h + li('Comprimento da rampa e normal:', [`L = h / sen θ = ${num(s.hh)} / sen ${num(s.ang)}° = ${auto(R.L)} m`, `N = m·g·cos θ = ${auto(R.N)} N`])
+      + li('Atrito e energia dissipada:', [`Fat = μ·N = ${num(s.mu)} × ${auto(R.N)} = ${auto(R.Fat)} N`, `|W_at| = Fat·L = ${auto(R.Fat)} × ${auto(R.L)} = ${auto(R.Wd)} J`])
+      + li('Balanço de energia:', [`Ec_final = Em − |W_at| = ${auto(R.Ei)} − ${auto(R.Wd)} = ${auto(R.Ef)} J`, `v = √(2·Ec / m) = ${auto(R.vf)} m/s`])
+      + li('Comparação sem atrito:', [`v = √(2·g·h) = ${auto(R.vid)} m/s`]);
+  },
+  notes: 'Com atrito a energia mecânica não se conserva: a parte dissipada vira calor nas superfícies. A energia total continua conservada.',
+  enun: s => `${cap(mtxt(s, 1))} é abandonad${o(s, 1)} no topo de uma rampa de ${num(s.hh)} m de altura, inclinada de ${num(s.ang)}°, com coeficiente de atrito ${num(s.mu)}. Considerando g = ${num(G)} m/s², determine a energia dissipada pelo atrito e a velocidade do corpo ao chegar à base da rampa.`,
+  draw(ctx, w, h, s, R){
+    const gy = h * .88, thv = clamp(R.th, 10 * D2R, 60 * D2R);
+    let Bw = w * .52, H = Bw * Math.tan(thv); if (H > h * .62){ H = h * .62; Bw = H / Math.tan(thv); }
+    const xL = 20, A = {x: xL, y: gy - H}, Cc = {x: xL + Bw, y: gy};
+    floor(ctx, w, h, gy);
+    ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(xL, gy); ctx.lineTo(Cc.x, Cc.y); ctx.closePath(); ctx.fillStyle = C.ground; ctx.fill(); ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.stroke();
+    const len = Math.hypot(Bw, H), sz = fitS(s.b1, len * .22, h * .14);
+    const put = (f, alpha) => { const p = {x: A.x + Math.cos(thv) * len * f, y: A.y + Math.sin(thv) * len * f}; ctx.globalAlpha = alpha; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(thv); drawBody(ctx, s.b1, 0, 0, sz, C.bodyA); ctx.restore(); ctx.globalAlpha = 1; };
+    put(.14, .45); if (R.slides) put(.86, 1);
+    hand(ctx, `h = ${num(s.hh)} m`, xL + 6, gy - H / 2, C.muted, 'left', 'middle');
+    if (R.slides){
+      const bx = w * .66, bw = Math.min(30, w * .06), base = gy, top = h * .2, kk = (base - top) / R.Ei;
+      [[R.Ei, C.ink, 'Em'], [R.Wd, C.apple, 'perdida'], [R.Ef, C.leaf, 'Ec final']].forEach(([v, col, nm], i) => {
+        const x = bx + i * (bw + 22), hh = Math.min(v, R.Ei) * kk;
+        ctx.globalAlpha = .7; ctx.fillStyle = col; ctx.fillRect(x, base - hh, bw, hh); ctx.globalAlpha = 1;
+        hand(ctx, nm, x + bw / 2, base - hh - 4, col, 'center', 'bottom', 13);
+      });
+    }
+    caption(ctx, w, R.slides ? `Dissipado: ${fmt(R.pct, 1)}% da energia.` : 'tg θ ≤ μ: o corpo não desliza.', w * .6);
+  }
+}
+];
+TOPICS.push(...NEW);
+TOPICS.find(t => t.id === 'energia').grupo = 'Trabalho e energia';
+const TOPIC_ORDER = ['mru','mruv','queda','lancamento','mcu','resultante','plano','blocos','polias','elevador','hooke','frenagem','looping','impulso','colisao','recuo','trabalho','potencia','energia','elastica','atrito_energia','centripeta'];
+TOPICS.sort((a, b) => TOPIC_ORDER.indexOf(a.id) - TOPIC_ORDER.indexOf(b.id));
+
+/* ================= motor ================= */
+TOPICS.forEach(T => { T.usesG = /\bG\b/.test([T.compute, T.steps, T.enun, T.results, T.check].filter(Boolean).map(String).join(' ')); });
+const STATE = {};
+let cur = null, R = null, anim = {t: 0, run: false};
+const sel = {area: null, picked: {}, solved: false};
+const AREA_DESC = {'Cinemática': 'posição, velocidade e aceleração', 'Dinâmica': 'forças e Leis de Newton', 'Momento linear': 'impulso, colisões e recuo', 'Trabalho e energia': 'trabalho, potência e energia', 'Movimento circular': 'curvas e força centrípeta'};
+const AREAS = [...new Set(TOPICS.map(t => t.grupo))];
+const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function getState(T){
+  if (!STATE[T.id]){
+    const s = {};
+    for (let k = 1; k <= T.bodies; k++){ s['b' + k] = T.def[k - 1]; s['m' + k] = BODIES[T.def[k - 1]].m; }
+    T.inputs.forEach(i => s[i.id] = i.val);
+    s.gMode = '9.81'; s.gVal = 9.81;
+    if (T.defaults) T.defaults(s);
+    STATE[T.id] = s;
+  }
+  return STATE[T.id];
+}
+function reveal(el, scroll){
+  const was = el.hidden; el.hidden = false;
+  if (was){ el.classList.remove('in'); void el.offsetWidth; el.classList.add('in'); }
+  if (scroll) setTimeout(() => el.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block: 'nearest'}), 30);
+}
+const hide = (...ids) => ids.forEach(id => $(id).hidden = true);
+
+/* etapa 1 */
+$('areas').innerHTML = AREAS.map(a => `<button type="button" class="area" data-a="${a}" aria-pressed="false"><b>${a}</b><small>${AREA_DESC[a] || ''}</small></button>`).join('');
+document.querySelectorAll('.area').forEach(b => b.addEventListener('click', () => chooseArea(b.dataset.a)));
+
+function chooseArea(a){
+  sel.area = a; cur = null; sel.solved = false;
+  document.querySelectorAll('.area').forEach(b => b.setAttribute('aria-pressed', b.dataset.a === a ? 'true' : 'false'));
+  const list = TOPICS.filter(t => t.grupo === a);
+  $('topics').innerHTML = list.map(t => `<button type="button" class="card" data-id="${t.id}" aria-pressed="false"><b>${t.nome}</b><span>${t.desc}</span></button>`).join('');
+  document.querySelectorAll('.card').forEach(b => b.addEventListener('click', () => chooseTopic(b.dataset.id)));
+  hide('s3', 's4', 's5');
+  reveal($('s2'), true);
+  if (list.length === 1) chooseTopic(list[0].id);
+}
+
+/* etapa 2 */
+function chooseTopic(id){
+  cur = TOPICS.find(t => t.id === id); sel.picked = {}; sel.solved = false; anim = {t: 0, run: false};
+  document.querySelectorAll('.card').forEach(b => b.setAttribute('aria-pressed', b.dataset.id === id ? 'true' : 'false'));
+  $('s3t').textContent = cur.bodies > 1 ? 'Escolha os corpos' : 'Escolha o corpo';
+  hide('s4', 's5');
+  document.querySelector('#s4 .st i').textContent = cur.bodies ? '4' : '3';
+  document.querySelector('#s5 .st i').textContent = cur.bodies ? '5' : '4';
+  if (!cur.bodies){ hide('s3'); renderFields(); reveal($('s4'), true); return; }
+  renderBodies();
+  reveal($('s3'), true);
+}
+
+/* etapa 3 */
+function renderBodies(newRow){
+  const T = cur, s = getState(T);
+  let html = '';
+  for (let k = 1; k <= T.bodies; k++){
+    if (k > 1 && !sel.picked[k - 1]) break;
+    html += `<div class="brow${k === newRow ? ' in' : ''}"><div class="blab">${T.bodyLabels[k - 1]}</div><div class="bodies">`
+      + (T.allow || ORDER).map(b => `<button type="button" class="bbtn" data-k="${k}" data-b="${b}" aria-pressed="${!!sel.picked[k] && s['b' + k] === b}"><canvas width="144" height="84" data-b="${b}"></canvas>${BODIES[b].nome}</button>`).join('')
+      + '</div></div>';
+  }
+  $('bodies').innerHTML = html;
+  drawIcons();
+  document.querySelectorAll('.bbtn').forEach(btn => btn.addEventListener('click', () => {
+    const k = +btn.dataset.k, first = !sel.picked[k];
+    s['b' + k] = btn.dataset.b; s['m' + k] = BODIES[btn.dataset.b].m; sel.picked[k] = true;
+    if (T.defaults) T.defaults(s);
+    const allPicked = [...Array(T.bodies)].every((_, i) => sel.picked[i + 1]);
+    renderBodies(first && k < T.bodies ? k + 1 : 0);
+    if (allPicked){ renderFields(); reveal($('s4'), first); if (sel.solved) recalc(); }
+  }));
+}
+function drawIcons(){
+  document.querySelectorAll('.bbtn canvas').forEach(cv => {
+    const t = cv.dataset.b, c = cv.getContext('2d');
+    c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, cv.width, cv.height); c.setTransform(2, 0, 0, 2, 0, 0);
+    const sz = fitS(t, 62, 34);
+    drawBody(c, t, 36, 38 - (34 - DIM[t][1] * sz) / 2, sz, C.bodyA);
+  });
+}
+
+/* etapa 4 */
+function fieldHTML(i){
+  if (i.type === 'select') return `<label class="fld"><span>${i.label}</span><select data-id="${i.id}">${i.options.map(o => `<option value="${o[0]}">${o[1]}</option>`).join('')}</select></label>`;
+  return `<label class="fld"><span>${i.label}</span><span class="inp"><input type="text" inputmode="decimal" autocomplete="off" data-id="${i.id}">${i.unit ? `<em>${i.unit}</em>` : ''}</span>${i.hint ? `<span class="hint">${i.hint}</span>` : ''}</label>`;
+}
+function renderFields(){
+  const T = cur, s = getState(T);
+  let html = '';
+  for (let k = 1; k <= (T.noMass ? 0 : T.bodies); k++){
+    const who = T.bodies > 1 ? `do corpo ${'AB'[k - 1]} (${BODIES[s['b' + k]].nome.toLowerCase()})` : `do corpo (${BODIES[s['b' + k]].nome.toLowerCase()})`;
+    html += fieldHTML({id: 'm' + k, label: 'Massa ' + who, unit: 'kg'});
+  }
+  T.inputs.filter(i => !i.show || i.show(s)).forEach(i => html += fieldHTML(i));
+  if (T.usesG) html += `<div class="gfield"><span>Aceleração da gravidade g</span>`
+    + [['9.81', '9,81 m/s²'], ['10', '10 m/s²'], ['outro', 'Outro valor']].map(o => `<button type="button" class="gopt" data-gm="${o[0]}" aria-pressed="${s.gMode === o[0]}">${o[1]}</button>`).join('')
+    + (s.gMode === 'outro' ? `<span class="inp"><input type="text" inputmode="decimal" autocomplete="off" data-id="gVal" aria-label="Valor de g"><em>m/s²</em></span>` : '')
+    + '</div>';
+  $('fields').innerHTML = html;
+  document.querySelectorAll('.gopt').forEach(b => b.addEventListener('click', () => {
+    s.gMode = b.dataset.gm;
+    if (s.gMode !== 'outro') s.gVal = +s.gMode;
+    renderFields();
+    if (s.gMode === 'outro'){ const el = document.querySelector('#fields input[data-id="gVal"]'); if (el){ el.focus(); el.select(); } }
+    if (sel.solved) recalc();
+  }));
+  document.querySelectorAll('#fields [data-id]').forEach(el => {
+    const id = el.dataset.id;
+    el.value = el.tagName === 'SELECT' ? String(s[id]) : toBR(s[id]);
+    if (el.tagName === 'SELECT') el.addEventListener('change', () => { const n = parseFloat(el.value); s[id] = isNaN(n) ? el.value : n; renderFields(); if (sel.solved) recalc(); });
+    else el.addEventListener('input', () => { s[id] = parseBR(el.value); if (sel.solved) recalc(); });
+  });
+  $('solve').hidden = sel.solved;
+}
+$('solve').onclick = () => {
+  sel.solved = true; $('solve').hidden = true;
+  $('tTitle').textContent = cur.nome;
+  $('tLaws').innerHTML = cur.leis.map(l => `<span class="law" title="${LAWS[l]}">${l}</span>`).join(' ');
+  $('animBtns').hidden = !cur.anim;
+  reveal($('s5'), true);
+  st.fit(); recalc();
+};
+
+/* etapa 5 */
+function validate(T, s){
+  if (!T.noMass) for (let k = 1; k <= T.bodies; k++) if (!(s['m' + k] > 0)) return `Informe a massa ${T.bodies > 1 ? 'do corpo ' + 'AB'[k - 1] : 'do corpo'}, maior que zero.`;
+  for (const i of T.inputs){
+    if (i.type === 'select' || (i.show && !i.show(s))) continue;
+    const v = s[i.id];
+    if (!isFinite(v)) return `Preencha o campo "${i.label}".`;
+    if (i.min !== undefined && v < i.min) return `"${i.label}" deve ser ${i.min > 0 && i.min < 1e-3 ? 'maior que zero' : 'no mínimo ' + num(i.min)}.`;
+    if (i.max !== undefined && v > i.max) return `"${i.label}" deve ser no máximo ${num(i.max)}.`;
+  }
+  if (T.usesG && !(s.gVal > 0)) return 'Informe um valor de g maior que zero.';
+  return T.check ? T.check(s) : null;
+}
+function recalc(){
+  const T = cur, s = getState(T);
+  if (T.usesG && isFinite(s.gVal) && s.gVal > 0) G = s.gVal;
+  const err = validate(T, s);
+  anim = {t: 0, run: false};
+  if (err){
+    R = {err};
+    $('res').innerHTML = `<p class="err">${err}</p>`; $('steps').innerHTML = ''; $('notes').innerHTML = ''; $('enun').textContent = '';
+    return;
+  }
+  R = T.compute(s);
+  $('res').innerHTML = T.results(s, R).map(r => `<div class="rrow${r[3] ? ' key' : ''}"><span class="lbl">${r[0]}</span><span class="dots"></span><span class="val">${r[1]}${r[2] ? ' ' + r[2] : ''}</span></div>`).join('');
+  $('steps').innerHTML = T.steps(s, R);
+  $('notes').innerHTML = T.notes ? `<p class="note">${T.notes}</p>` : '';
+  $('enun').textContent = T.enun(s, R);
+}
+
+/* palco */
+const cv = $('cv'), ctx = cv.getContext('2d');
+const st = {w: 0, h: 0, fit(){
+  const dpr = window.devicePixelRatio || 1, w = cv.parentElement.clientWidth; if (!w) return;
+  const h = Math.round(clamp(w * .58, 240, 380));
+  cv.style.height = h + 'px'; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); this.w = w; this.h = h;
+}};
+window.addEventListener('resize', () => { if (sel.solved) st.fit(); });
+
+$('go').onclick = () => { if (R && !R.err) anim = {t: 0, run: true}; };
+$('rs').onclick = () => { anim = {t: 0, run: false}; };
+$('copy').onclick = () => {
+  const txt = $('enun').textContent; if (!txt || !navigator.clipboard) return;
+  navigator.clipboard.writeText(txt).then(() => { $('copy').textContent = 'Enunciado copiado'; setTimeout(() => $('copy').textContent = 'Copiar enunciado', 1600); }, () => {});
+};
+
+/* tema */
+let dark = true;
+function setTheme(isDark){
+  dark = isDark;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  $('theme').textContent = dark ? 'Quadro branco' : 'Quadro negro';
+  readColors(); drawIcons();
+  try { localStorage.setItem('newtonar-tema', dark ? 'dark' : 'light'); } catch (e) {}
+}
+$('theme').onclick = () => setTheme(!dark);
+try { if (localStorage.getItem('newtonar-tema') === 'light') setTheme(false); } catch (e) {}
+
+/* laço */
+let last = performance.now();
+function loop(now){
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (sel.solved && cur && st.w){
+    const T = cur, s = getState(T);
+    ctx.clearRect(0, 0, st.w, st.h);
+    if (dark){ ctx.shadowColor = 'rgba(238,239,232,.35)'; ctx.shadowBlur = 1.5; }
+    if (R && R.err){ caption(ctx, st.w, R.err); $('live').hidden = true; }
+    else if (R){
+      if (anim.run){ anim.t += dt; const D = T.dur(s, R); if (anim.t >= D){ anim.t = D; anim.run = false; } }
+      T.draw(ctx, st.w, st.h, s, R, anim);
+      if (T.live){ $('live').hidden = false; $('live').innerHTML = T.live(s, R, anim); } else $('live').hidden = true;
+    }
+    ctx.shadowBlur = 0;
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { drawIcons(); if (sel.solved) st.fit(); });
+
+/* fórmulas flutuantes: referências à obra de Newton */
+(function ghost(){
+  const items = [
+    ['F = m·a', 7, 14, 2.6, -6, .09], ['Philosophiæ Naturalis Principia Mathematica', 54, 8, 1.3, 2, .07],
+    ['F = G · m₁m₂ / r²', 72, 30, 2.1, 4, .08], ['Lex I', 4, 46, 2.2, -3, .07], ['Lex II', 88, 52, 2.2, 5, .07],
+    ['Lex III', 10, 82, 2.2, -4, .07], ['p = m·v', 60, 62, 1.9, -5, .08], ['Ec = ½·m·v²', 22, 64, 1.7, 3, .07],
+    ['ẋ, ẏ — fluxões', 80, 86, 1.5, -2, .07], ['F·Δt = Δp', 38, 92, 1.7, 2, .07], ['Londres, 1687', 44, 24, 1.3, -2, .06],
+    ['ΣF = 0', 90, 12, 1.8, 6, .08], ['v² = v₀² + 2·a·Δs', 2, 28, 1.4, 4, .06], ['ac = v² / r', 70, 76, 1.6, -4, .07],
+    ['T² ∝ r³', 30, 46, 1.6, 3, .06], ['g = 9,81 m/s²', 50, 80, 1.4, -3, .06], ['Opticks, 1704', 86, 68, 1.3, 2, .06]
+  ];
+  let h = items.map(([t, x, y, sz, r, o], i) => `<span style="left:${x}%;top:${y}%;font-size:${sz}rem;--r:${r}deg;--o:${o};--d:${16 + (i % 5) * 4}s;--dx:${(i % 2 ? 1 : -1) * (6 + i % 4 * 3)}px;--dy:${(i % 3 ? -1 : 1) * (10 + i % 4 * 3)}px">${t}</span>`).join('');
+  // órbita elíptica (gravitação) e prisma (óptica), em traço de giz
+  h += '<svg style="left:62%;top:38%;width:220px" viewBox="0 0 220 140" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="110" cy="70" rx="100" ry="56" stroke-dasharray="6 6"/><circle cx="72" cy="70" r="9"/><circle cx="208" cy="62" r="5" fill="currentColor"/></svg>';
+  h += '<svg style="left:14%;top:4%;width:200px" viewBox="0 0 200 110" fill="none" stroke="currentColor" stroke-width="2"><path d="M0 62 L82 58"/><path d="M80 98 L105 20 L130 98 Z"/><path d="M118 62 L200 40 M118 64 L200 58 M118 66 L200 76 M118 68 L200 94" stroke-width="1.5"/></svg>';
+  h += '<svg style="left:3%;top:56%;width:70px" viewBox="0 0 70 80" fill="none" stroke="currentColor" stroke-width="2"><path d="M35 72 c-18 0 -24 -14 -21 -26 c3 -11 13 -13 21 -8 c8 -5 18 -3 21 8 c3 12 -3 26 -21 26z"/><path d="M35 38 q1 -8 5 -12 M39 30 q9 -7 16 -2 q-7 7 -16 2z"/><path d="M60 4 L60 22 M55 17 L60 24 L65 17" stroke-width="1.5"/></svg>';
+  $('ghost').innerHTML = h;
+})();
+
+window.__newtonar = {TOPICS, getState, BODIES, ORDER, chooseArea, chooseTopic, sel, ctx, st, get R(){ return R; }};
+})();
+</script>
+</body>
+</html>
+
+</body></html>
