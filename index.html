@@ -1,10 +1,11 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Newtonar | Mecânica no quadro</title>
+<meta name="description" content="Newtonar: ferramenta de ensino de Mecânica e das Leis de Newton, com simulação, passo a passo e enunciado gerado. Prof. Me. Rodrigo Gonçalves (Prof Oswy).">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%8D%8E%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
@@ -217,7 +218,7 @@ footer{position:relative;z-index:1;margin-top:60px}
       <canvas id="cv"></canvas>
       <div id="live" hidden></div>
       <div class="simbar">
-        <span id="animBtns"><button class="chalkbtn small go" id="go" type="button">Simular</button> <button class="chalkbtn small" id="rs" type="button">Reiniciar</button></span>
+        <span id="animBtns"><button class="chalkbtn small go" id="go" type="button">▶ Play</button> <button class="chalkbtn small" id="rs" type="button">Reiniciar</button></span>
         <span class="scale-note">desenho fora de escala</span>
       </div>
     </div>
@@ -466,16 +467,22 @@ const TOPICS = [
   },
   notes: 'Peso e normal têm mesma intensidade aqui, mas não são par ação e reação: atuam no mesmo corpo. Para simplificar, o mesmo μ é usado para atrito estático e cinético.',
   enun: s => `${cap(mtxt(s, 1))} está em repouso sobre uma superfície horizontal com coeficiente de atrito ${num(s.mu)}. Uma força horizontal constante de ${num(s.F)} N é aplicada ao corpo durante ${num(s.t)} s. Considerando g = ${num(G)} m/s², determine: a) a força de atrito; b) a força resultante; c) a aceleração; d) a velocidade ao final desse intervalo.`,
-  draw(ctx, w, h, s, R){
-    const gy = h * .74;
+  dur(s, R){ return R.moves ? clamp(s.t, 2, 5) : 2; },
+  live(s, R, an){ const tt = clamp(an.t / this.dur(s, R), 0, 1) * (R.moves ? s.t : 0); return `<span>t = <b>${fmt(tt, 2)}</b> s</span><span>v = <b>${fmt(R.a * tt, 2)}</b> m/s</span><span>d = <b>${fmt(R.a * tt * tt / 2, 2)}</b> m</span>`; },
+  draw(ctx, w, h, s, R, an){
+    const gy = h * .74, sz = fitS(s.b1, w * .22, h * .26), bw = DIM[s.b1][0] * sz, x0 = 18 + bw / 2;
+    const tt = clamp(an.t / this.dur(s, R), 0, 1) * (R.moves ? s.t : 0), d = R.a * tt * tt / 2;
+    const scale = clamp((w - x0 - bw / 2 - 90) / Math.max(R.d, 1), .02, 80);
     floor(ctx, w, h, gy, s.mu > 0 ? C.brass : null, Math.min(.35, s.mu * .4));
-    const x = w * .42, b = drawBody(ctx, s.b1, x, gy, fitS(s.b1, w * .3, h * .3), C.bodyA), cy = gy - b.h / 2;
+    ruler(ctx, w, h, gy, 0, scale, x0);
+    const x = x0 + d * scale, b = drawBody(ctx, s.b1, x, gy, sz, C.bodyA), cy = gy - b.h / 2;
     const L = forceLen(h, Math.max(R.P, s.F));
     arrow(ctx, x, cy, x, cy + L(R.P), C.weight, 'P');
     arrow(ctx, x, cy, x, cy - L(R.N), C.sky, 'N');
     arrow(ctx, x + b.w / 2, cy, x + b.w / 2 + L(s.F), cy, C.apple, 'F');
     arrow(ctx, x - b.w / 2, gy - 5, x - b.w / 2 - L(R.Fat), gy - 5, C.brass, 'Fat');
-    caption(ctx, w, R.moves ? `Resultante para a direita: a = ${auto(R.a)} m/s².` : 'F não vence o atrito máximo: o corpo fica parado.');
+    if (R.a * tt > 1e-9) arrow(ctx, x, gy - b.h - 16, x + 12 + 60 * tt / s.t, gy - b.h - 16, C.leaf, 'v');
+    caption(ctx, w, an.t === 0 ? 'Toque em ▶ Play.' : R.moves ? `Resultante para a direita: a = ${auto(R.a)} m/s².` : 'F não vence o atrito máximo: o corpo fica parado.');
   }
 },
 {
@@ -507,7 +514,9 @@ const TOPICS = [
   },
   notes: 'A massa se cancela na aceleração: a = g·(sen θ − μ·cos θ). Corpos leves e pesados descem do mesmo jeito.',
   enun: s => `${cap(mtxt(s, 1))} é abandonad${o(s, 1)} no topo de uma rampa de ${num(s.L)} m de comprimento, inclinada de ${num(s.ang)}° em relação à horizontal. O coeficiente de atrito entre o corpo e a rampa é ${num(s.mu)}. Considerando g = ${num(G)} m/s², verifique se o corpo desliza e, em caso afirmativo, determine a aceleração, a velocidade ao final da rampa e o tempo de descida.`,
-  draw(ctx, w, h, s, R){
+  dur(s, R){ return R.moves ? clamp(R.t, 1.5, 5) : 2; },
+  live(s, R, an){ const tt = R.moves ? clamp(an.t / this.dur(s, R), 0, 1) * R.t : 0; return `<span>t = <b>${fmt(tt, 2)}</b> s</span><span>v = <b>${fmt(R.a * tt, 2)}</b> m/s</span><span>percorrido = <b>${fmt(R.a * tt * tt / 2, 2)}</b> m</span>`; },
+  draw(ctx, w, h, s, R, an){
     const gy = h * .88, thv = clamp(R.th, 8 * D2R, 62 * D2R);
     let Bw = w * .72, H = Bw * Math.tan(thv);
     if (H > h * .64){ H = h * .64; Bw = H / Math.tan(thv); }
@@ -516,9 +525,12 @@ const TOPICS = [
     ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(xL, gy); ctx.lineTo(Cc.x, Cc.y); ctx.closePath();
     ctx.fillStyle = C.ground; ctx.fill(); ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.stroke();
     const len = Math.hypot(Bw, H), ux = {x: Math.cos(thv), y: Math.sin(thv)}, nx = {x: Math.sin(thv), y: -Math.cos(thv)};
-    const p = {x: A.x + ux.x * len * .5, y: A.y + ux.y * len * .5};
+    const sz = fitS(s.b1, len * .24, h * .18), bw = DIM[s.b1][0] * sz;
+    const tt = R.moves ? clamp(an.t / this.dur(s, R), 0, 1) * R.t : 0, f = R.moves ? (R.a * tt * tt / 2) / s.L : 0;
+    const f0 = bw / 2 / len + .02, f1 = 1 - bw / 2 / len - .02, pf = f0 + (f1 - f0) * f;
+    const p = {x: A.x + ux.x * len * pf, y: A.y + ux.y * len * pf};
     ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(thv);
-    const b = drawBody(ctx, s.b1, 0, 0, fitS(s.b1, len * .28, h * .2), C.bodyA);
+    const b = drawBody(ctx, s.b1, 0, 0, sz, C.bodyA);
     ctx.restore();
     const c = {x: p.x + nx.x * b.h / 2, y: p.y + nx.y * b.h / 2}, L = forceLen(h, R.P);
     arrow(ctx, c.x, c.y, c.x, c.y + L(R.P), C.weight, 'P');
@@ -528,9 +540,8 @@ const TOPICS = [
     const q = {x: p.x - ux.x * b.w / 2, y: p.y - ux.y * b.w / 2};
     arrow(ctx, q.x, q.y, q.x - ux.x * L(R.Fat), q.y - ux.y * L(R.Fat), C.brass, 'Fat');
     ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(Cc.x, Cc.y, 38, Math.PI, Math.PI + thv); ctx.stroke();
-    ctx.fillStyle = C.ink; ctx.font = '15px ' + HAND; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
-    ctx.fillText(`θ = ${num(s.ang)}°`, Cc.x - 44, Cc.y - 4);
-    caption(ctx, w, R.moves ? 'Desliza: Px supera o atrito máximo.' : 'Fica parado: o atrito estático equilibra Px.', w * .5);
+    hand(ctx, `θ = ${num(s.ang)}°`, Cc.x - 44, Cc.y - 4, C.ink, 'right', 'bottom');
+    caption(ctx, w, an.t === 0 ? 'Toque em ▶ Play para soltar o corpo.' : R.moves ? 'Desliza: Px supera o atrito máximo.' : 'Fica parado: o atrito estático equilibra Px.', w * .5);
   }
 },
 {
@@ -558,18 +569,25 @@ const TOPICS = [
   },
   notes: 'O fio puxa A para trás e B para a frente com a mesma tração T: é um par ação e reação transmitido pelo fio.',
   enun: s => `${cap(mtxt(s, 1))} (corpo A) e ${mtxt(s, 2)} (corpo B) estão ligados por um fio ideal sobre uma superfície horizontal com coeficiente de atrito ${num(s.mu)}. Uma força horizontal de ${num(s.F)} N é aplicada ao corpo A. Considerando g = ${num(G)} m/s², determine a aceleração do conjunto e a tração no fio.`,
-  draw(ctx, w, h, s, R){
+  TS: 3,
+  dur(){ return 3; },
+  live(s, R, an){ const tt = clamp(an.t / 3, 0, 1) * this.TS * (R.moves ? 1 : 0); return `<span>t = <b>${fmt(tt, 2)}</b> s</span><span>v = <b>${fmt(R.a * tt, 2)}</b> m/s</span><span>d = <b>${fmt(R.a * tt * tt / 2, 2)}</b> m</span>`; },
+  draw(ctx, w, h, s, R, an){
     const gy = h * .74;
     floor(ctx, w, h, gy, s.mu > 0 ? C.brass : null, Math.min(.35, s.mu * .4));
-    const sB = fitS(s.b2, w * .24, h * .26), sA = fitS(s.b1, w * .24, h * .26);
-    const wB = DIM[s.b2][0] * sB, wA = DIM[s.b1][0] * sA, gap = w * .12;
-    const xB = w * .08 + wB / 2, xA = xB + wB / 2 + gap + wA / 2;
+    const sB = fitS(s.b2, w * .2, h * .24), sA = fitS(s.b1, w * .2, h * .24);
+    const wB = DIM[s.b2][0] * sB, wA = DIM[s.b1][0] * sA, gap = w * .1;
+    const tt = clamp(an.t / 3, 0, 1) * this.TS * (R.moves ? 1 : 0), d = R.a * tt * tt / 2, dTot = R.a * this.TS * this.TS / 2;
+    const x0 = 14 + wB / 2, room = w - (x0 + wB / 2 + gap + wA + 70);
+    const scale = clamp(room / Math.max(dTot, 1), .02, 80);
+    ruler(ctx, w, h, gy, 0, scale, x0);
+    const xB = x0 + d * scale, xA = xB + wB / 2 + gap + wA / 2;
     const bB = drawBody(ctx, s.b2, xB, gy, sB, C.bodyB), bA = drawBody(ctx, s.b1, xA, gy, sA, C.bodyA);
     const ry = gy - Math.min(bA.h, bB.h) * .45;
     ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(xB + wB / 2, ry); ctx.lineTo(xA - wA / 2, ry); ctx.stroke();
     label(ctx, 'A', xA, gy - bA.h - 6); label(ctx, 'B', xB, gy - bB.h - 6);
     const L = forceLen(h, Math.max(s.F, R.T || 0));
-    arrow(ctx, xA + wA / 2, gy - bA.h / 2, xA + wA / 2 + L(s.F), gy - bA.h / 2, C.apple, 'F');
+    arrow(ctx, xA + wA / 2, gy - bA.h / 2, xA + wA / 2 + Math.min(L(s.F), 60), gy - bA.h / 2, C.apple, 'F');
     if (R.moves){
       const lt = Math.min(L(R.T), gap * .45);
       arrow(ctx, xA - wA / 2, ry, xA - wA / 2 - lt, ry, C.weight, 'T');
@@ -579,7 +597,7 @@ const TOPICS = [
         arrow(ctx, xB - wB / 2, gy - 5, xB - wB / 2 - L(R.FatB), gy - 5, C.brass, '');
       }
     }
-    caption(ctx, w, R.moves ? `a = ${auto(R.a)} m/s²  |  T = ${auto(R.T)} N` : 'F não supera o atrito total: o conjunto fica parado.');
+    caption(ctx, w, an.t === 0 ? 'Toque em ▶ Play: a força age durante 3 s.' : R.moves ? `a = ${auto(R.a)} m/s²  |  T = ${auto(R.T)} N` : 'F não supera o atrito total: o conjunto fica parado.');
   }
 },
 {
@@ -632,7 +650,7 @@ const TOPICS = [
       arrow(ctx, px, gy - b.h - 16, px + 14 + 70 * q.v / s.v0, gy - b.h - 16, C.leaf, 'v');
       if (s.mu > 0) arrow(ctx, px - b.w / 2, gy - 5, px - b.w / 2 - 40, gy - 5, C.brass, 'Fat');
     }
-    caption(ctx, w, an.t === 0 ? 'Toque em Simular.' : (q.v > 0 ? (s.mu > 0 ? 'Só o atrito atua na horizontal e reduz a velocidade.' : 'Sem atrito: velocidade constante (1ª Lei).') : 'Parou.'), w * .6);
+    caption(ctx, w, an.t === 0 ? 'Toque em ▶ Play.' : (q.v > 0 ? (s.mu > 0 ? 'Só o atrito atua na horizontal e reduz a velocidade.' : 'Sem atrito: velocidade constante (1ª Lei).') : 'Parou.'), w * .6);
   }
 },
 /* ---------- MOMENTO LINEAR ---------- */
@@ -654,22 +672,29 @@ const TOPICS = [
     + li('Velocidade final:', [`v = Q / m = ${auto(R.Qf)} / ${num(s.m1)} = ${auto(R.vf)} m/s`]),
   notes: 'Newton escreveu a 2ª Lei como variação da quantidade de movimento: F = ΔQ/Δt. Para massa constante, isso é o mesmo que F = m·a. Air bags aumentam Δt para reduzir a força num mesmo impulso.',
   enun: s => `${cap(mtxt(s, 1))} ${s.v0 === 0 ? 'está em repouso' : `move-se a ${num(s.v0)} m/s`} quando recebe, na direção ${s.v0 < 0 ? 'oposta ao movimento' : 'do movimento'}, uma força média de ${num(s.F)} N durante ${num(s.dt)} s. Determine o impulso aplicado e a velocidade final do corpo.`,
-  draw(ctx, w, h, s, R){
-    const gy = h * .76, sz = fitS(s.b1, w * .22, h * .26);
+  T1: 1.2, T2: 1.9,
+  dur(){ return 4.2; },
+  velAt(s, R, t){ return t < this.T1 ? s.v0 : t < this.T2 ? s.v0 + (R.vf - s.v0) * (t - this.T1) / (this.T2 - this.T1) : R.vf; },
+  path(s, R, w){
+    const N = 120, D = 4.2, pts = []; let x = 0, lo = 0, hi = 0;
+    for (let i = 0; i <= N; i++){ const t = D * i / N; if (i) x += this.velAt(s, R, t) * D / N; pts.push(x); lo = Math.min(lo, x); hi = Math.max(hi, x); }
+    return {pts, lo, hi};
+  },
+  live(s, R, an){ const v = this.velAt(s, R, an.t); return `<span>v = <b>${fmt(v, 2)}</b> m/s</span><span>Q = m·v = <b>${auto(s.m1 * v)}</b> kg·m/s</span><span>${an.t >= this.T1 && an.t < this.T2 ? '<b>força agindo</b>' : an.t >= this.T2 ? 'depois do impulso' : 'antes do impulso'}</span>`; },
+  draw(ctx, w, h, s, R, an){
+    const gy = h * .76, sz = fitS(s.b1, w * .16, h * .22), bw = DIM[s.b1][0] * sz;
     floor(ctx, w, h, gy);
-    const x1 = w * .2, x2 = w * .78;
-    ctx.globalAlpha = .4; const b1 = drawBody(ctx, s.b1, x1, gy, sz, C.bodyA); ctx.globalAlpha = 1;
-    const b2 = drawBody(ctx, s.b1, x2, gy, sz, C.bodyA);
-    ctx.fillStyle = C.muted; ctx.font = '15px ' + HAND; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-    ctx.fillText('antes', x1, gy + 8); ctx.fillText('depois', x2, gy + 8);
-    const vmax = Math.max(Math.abs(s.v0), Math.abs(R.vf), 1e-9), kv = Math.min(80, w * .14) / vmax;
-    const vy1 = gy - b1.h - 16, vy2 = gy - b2.h - 16;
-    if (Math.abs(s.v0) > 1e-9) arrow(ctx, x1, vy1, x1 + s.v0 * kv, vy1, C.leaf, 'v₀'); else label(ctx, 'v₀ = 0', x1, vy1 + 6, C.leaf);
-    if (Math.abs(R.vf) > 1e-9) arrow(ctx, x2, vy2, x2 + R.vf * kv, vy2, C.leaf, 'v'); else label(ctx, 'v = 0', x2, vy2 + 6, C.leaf);
-    const my = gy - Math.max(b1.h, b2.h) / 2;
-    arrow(ctx, x1 + b1.w / 2 + 10, my, x2 - b2.w / 2 - 10, my, C.apple, '');
-    label(ctx, `I = F·Δt = ${auto(R.I)} N·s`, (x1 + x2) / 2, my - 8, C.apple);
-    caption(ctx, w, 'O impulso da força muda a quantidade de movimento do corpo.');
+    const P = this.path(s, R, w), span = Math.max(P.hi - P.lo, 1e-9), room = w - bw - 40;
+    const k = room / span, X = m => 20 + bw / 2 + (m - P.lo) * k;
+    const i = Math.round(clamp(an.t / 4.2, 0, 1) * 120), x = X(P.pts[i]), v = this.velAt(s, R, an.t);
+    const xa = X(P.pts[Math.round(this.T1 / 4.2 * 120)]), xb = X(P.pts[Math.round(this.T2 / 4.2 * 120)]);
+    ctx.globalAlpha = .12; ctx.fillStyle = C.apple; ctx.fillRect(Math.min(xa, xb) - bw / 2, gy - h * .5, Math.abs(xb - xa) + bw, h * .5); ctx.globalAlpha = 1;
+    hand(ctx, 'região do impulso', (xa + xb) / 2, gy - h * .5 - 2, C.apple, 'center', 'bottom', 14);
+    const b = drawBody(ctx, s.b1, x, gy, sz, C.bodyA);
+    const vmax = Math.max(Math.abs(s.v0), Math.abs(R.vf), 1e-9), kv = Math.min(70, w * .12) / vmax;
+    if (Math.abs(v) > 1e-9) arrow(ctx, x, gy - b.h - 14, x + v * kv, gy - b.h - 14, C.leaf, 'v'); else label(ctx, 'v = 0', x, gy - b.h - 8, C.leaf);
+    if (an.t >= this.T1 && an.t < this.T2){ const cy = gy - b.h / 2; arrow(ctx, x + b.w / 2, cy, x + b.w / 2 + 50, cy, C.apple, 'F'); }
+    caption(ctx, w, an.t === 0 ? 'Toque em ▶ Play.' : an.t < this.T1 ? `Antes: Q₀ = ${auto(R.Q0)} kg·m/s.` : an.t < this.T2 ? `Força agindo por Δt: I = ${auto(R.I)} N·s.` : `Depois: Q = ${auto(R.Qf)} kg·m/s.`);
   }
 },
 {
@@ -732,7 +757,7 @@ const TOPICS = [
       const cx = (xA + bA.w / 2 + xB - bB.w / 2) / 2, cy = gy - Math.min(bA.h, bB.h) / 2;
       arrow(ctx, cx, cy, cx - 50, cy, C.apple, ''); arrow(ctx, cx, cy, cx + 50, cy, C.apple, '');
     }
-    caption(ctx, w, !R.hit ? 'A não alcança B: não há colisão.' : (an.t === 0 ? 'Toque em Simular.' : (an.t < this.TC ? 'Antes do choque.' : 'Depois do choque: Q total igual ao de antes.')));
+    caption(ctx, w, !R.hit ? 'A não alcança B: não há colisão.' : (an.t === 0 ? 'Toque em ▶ Play.' : (an.t < this.TC ? 'Antes do choque.' : 'Depois do choque: Q total igual ao de antes.')));
   }
 },
 {
@@ -777,7 +802,7 @@ const TOPICS = [
       arrow(ctx, xA, gy - bA.h - 12, xA + R.vA * kv - 8, gy - bA.h - 12, C.leaf, 'vA');
       arrow(ctx, xB, yB - bB.h - 12, xB + s.vB * kv, yB - bB.h - 12, C.leaf, 'vB');
     }
-    caption(ctx, w, t === 0 ? 'Repouso: Q total = 0. Toque em Simular.' : (t < .5 ? 'Forças iguais e opostas, em corpos diferentes.' : 'Q de A e de B têm mesmo módulo e sentidos opostos.'));
+    caption(ctx, w, t === 0 ? 'Repouso: Q total = 0. Toque em ▶ Play.' : (t < .5 ? 'Forças iguais e opostas, em corpos diferentes.' : 'Q de A e de B têm mesmo módulo e sentidos opostos.'));
   }
 },
 /* ---------- ENERGIA ---------- */
@@ -857,7 +882,7 @@ const TOPICS = [
     const ang = Math.atan2(b.y - a.y, b.x - a.x);
     ctx.save(); ctx.translate(q.x, q.y); ctx.rotate(ang); drawBody(ctx, s.b1, 0, 0, fitS(s.b1, w * .1, h * .1), C.bodyA); ctx.restore();
     this._live = q;
-    caption(ctx, w, an.t === 0 ? 'Toque em Simular.' : (!R.reach && tt >= P.Ttot ? 'Não chega a B: a energia acabou antes.' : 'Ep vira Ec na descida e Ec vira Ep na subida.'), w * .55);
+    caption(ctx, w, an.t === 0 ? 'Toque em ▶ Play.' : (!R.reach && tt >= P.Ttot ? 'Não chega a B: a energia acabou antes.' : 'Ep vira Ec na descida e Ec vira Ep na subida.'), w * .55);
   }
 },
 /* ---------- MOVIMENTO CIRCULAR ---------- */
@@ -901,7 +926,7 @@ const TOPICS = [
     ctx.save(); ctx.translate(px, py); ctx.rotate(Math.atan2(ty, tx)); const b = drawBody(ctx, s.b1, 0, DIM[s.b1][1] * sz / 2, sz, C.bodyA); ctx.restore();
     arrow(ctx, px, py, px + tx * 60, py + ty * 60, C.leaf, 'v');
     if (!release){ const dx = cx - px, dy = cy - py, L = Math.hypot(dx, dy); arrow(ctx, px, py, px + dx / L * Math.min(70, r * .6), py + dy / L * Math.min(70, r * .6), C.apple, 'Fc'); }
-    caption(ctx, w, an.t === 0 ? 'Toque em Simular.' : (release ? 'Derrapou: sem centrípeta suficiente, segue pela tangente (1ª Lei).' : 'O atrito aponta para o centro e faz o papel de centrípeta.'), w - 28);
+    caption(ctx, w, an.t === 0 ? 'Toque em ▶ Play.' : (release ? 'Derrapou: sem centrípeta suficiente, segue pela tangente (1ª Lei).' : 'O atrito aponta para o centro e faz o papel de centrípeta.'), w - 28);
   }
 }
 ];
@@ -909,7 +934,7 @@ const TOPICS = [
 /* ================= assuntos adicionais ================= */
 const fh = (s0, v) => `${num(s0)} ${v < 0 ? '−' : '+'} ${num(Math.abs(v))}·t`;
 const dirTxt = v => v === 0 ? 'em repouso' : `com velocidade constante de ${num(Math.abs(v))} m/s para a ${v > 0 ? 'direita' : 'esquerda'}`;
-const prog = (an, D) => (an.run || an.t > 0) ? Math.min(1, an.t / D) : 1;
+const prog = (an, D) => clamp(an.t / D, 0, 1);
 const btxt = (s, k) => body(s, k).txt;
 function graph(ctx, x, y, w, h, fns, T, tc, cols, yl, xl){
   const N = 80; let lo = 0, hi = 0;
@@ -1180,7 +1205,7 @@ const NEW = [
       arrow(ctx, cx, cy - r1, cx + R.v1 * kv, cy - r1, C.leaf, 'v₁'); arrow(ctx, cx, cy - r2, cx + R.v2 * kv, cy - r2, C.sky, 'v₂');
       hand(ctx, big ? 'polia 2 (externa) e polia 1 (interna)' : 'polia 1 (externa) e polia 2 (interna)', cx, cy + Math.max(r1, r2) + 24, C.ink, 'center');
     }
-    caption(ctx, w, an.t === 0 ? 'Toque em Simular para girar.' : (R.belt ? 'Correia: mesma velocidade linear v.' : 'Mesmo eixo: mesma velocidade angular ω.'));
+    caption(ctx, w, an.t === 0 ? 'Toque em ▶ Play para girar.' : (R.belt ? 'Correia: mesma velocidade linear v.' : 'Mesmo eixo: mesma velocidade angular ω.'));
   }
 },
 /* ---------- DINÂMICA (novos) ---------- */
@@ -1263,19 +1288,27 @@ const NEW = [
     + li('A balança é calibrada para mostrar N/g:', [`leitura = N / g = ${auto(R.N)} / ${num(G)} = ${auto(R.ap)} kg`]),
   notes: 'A balança mede a normal, não o peso. Pela 3ª Lei, a pessoa empurra a balança com a mesma força N. Em queda livre (a = −g), N = 0: imponderabilidade.',
   enun: s => `${cap(btxt(s, 1))} de massa ${num(s.m1)} kg está sobre uma balança dentro de um elevador que tem aceleração de ${num(Math.abs(s.a))} m/s² ${s.a >= 0 ? 'para cima' : 'para baixo'}. Considerando g = ${num(G)} m/s², determine a força normal e a indicação da balança.`,
-  draw(ctx, w, h, s, R){
-    const cw = Math.min(w * .4, 210), ch = h * .7, cx = w * .42, top = h * .16, x1 = cx - cw / 2;
-    dashLine(ctx, x1 - 18, 0, x1 - 18, h); dashLine(ctx, x1 + cw + 18, 0, x1 + cw + 18, h);
+  dur(){ return 3.5; },
+  live(s, R, an){ const on = an.t > 0; return `<span>a = <b>${fmt(on ? s.a : 0, 2)}</b> m/s²</span><span>N = <b>${auto(on ? R.N : R.P)}</b> N</span><span>balança = <b>${fmt(on ? R.ap : s.m1, 1)}</b> kg</span>`; },
+  draw(ctx, w, h, s, R, an){
+    const cw = Math.min(w * .36, 190), ch = h * .56, cx = w * .42, x1 = cx - cw / 2, on = an.t > 0;
+    const t = Math.min(an.t, 3.5), amp = h * .14, dir = Math.abs(s.a) > 1e-9 ? Math.sign(s.a) : 1;
+    const disp = Math.abs(s.a) > 1e-9 ? amp * (t / 3.5) * (t / 3.5) * 2 - amp : amp * (2 * t / 3.5 - 1);
+    const top = h * .22 - dir * (on ? disp : -amp);
+    ctx.strokeStyle = C.rule; ctx.lineWidth = 1;
+    for (let y = 8; y < h; y += 28){ ctx.beginPath(); ctx.moveTo(x1 - 26, y); ctx.lineTo(x1 - 12, y); ctx.moveTo(x1 + cw + 12, y); ctx.lineTo(x1 + cw + 26, y); ctx.stroke(); }
+    dashLine(ctx, x1 - 12, 0, x1 - 12, h); dashLine(ctx, x1 + cw + 12, 0, x1 + cw + 12, h);
     ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, top); ctx.stroke();
     ctx.lineWidth = 2.5; ctx.strokeRect(x1, top, cw, ch);
-    const fy = top + ch - 6; ctx.lineWidth = 2; ctx.strokeRect(cx - 32, fy - 8, 64, 8);
-    const b = drawBody(ctx, s.b1, cx, fy - 8, fitS(s.b1, cw * .4, ch * .5), C.bodyA), cy = fy - 8 - b.h / 2;
-    const L = forceLen(h, Math.max(R.P, R.N));
-    arrow(ctx, cx - 6, cy, cx - 6, cy + L(R.P), C.weight, 'P'); arrow(ctx, cx + 6, cy, cx + 6, cy - L(R.N), C.sky, 'N');
-    ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5; ctx.strokeRect(x1 + 10, top + 10, 92, 30);
-    hand(ctx, `${fmt(R.ap, 1)} kg`, x1 + 56, top + 36, C.brass, 'center', 'bottom', 18);
-    const ax = x1 + cw + 46, ay = top + ch / 2;
-    if (Math.abs(s.a) > 1e-9) arrow(ctx, ax, ay, ax, ay - clamp(s.a / G * 70, -80, 80), C.leaf, 'a'); else hand(ctx, 'a = 0', ax, ay, C.leaf, 'center', 'middle');
+    const fy = top + ch - 6; ctx.lineWidth = 2; ctx.strokeRect(cx - 30, fy - 8, 60, 8);
+    const b = drawBody(ctx, s.b1, cx, fy - 8, fitS(s.b1, cw * .38, ch * .5), C.bodyA), cy = fy - 8 - b.h / 2;
+    const N = on ? R.N : R.P, L = forceLen(h, Math.max(R.P, R.N));
+    arrow(ctx, cx - 6, cy, cx - 6, cy + L(R.P), C.weight, 'P'); arrow(ctx, cx + 6, cy, cx + 6, cy - L(N), C.sky, 'N');
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5; ctx.strokeRect(x1 + 8, top + 8, 86, 28);
+    hand(ctx, `${fmt(on ? R.ap : s.m1, 1)} kg`, x1 + 51, top + 33, C.brass, 'center', 'bottom', 18);
+    const ax = x1 + cw + 50, ay = h * .5;
+    if (on && Math.abs(s.a) > 1e-9) arrow(ctx, ax, ay, ax, ay - Math.sign(s.a) * clamp(Math.abs(s.a) / G * 70, 30, 80), C.leaf, 'a'); else hand(ctx, 'a = 0', ax, ay, C.leaf, 'center', 'middle');
+    caption(ctx, w, !on ? 'Parado: a balança marca a massa real. Toque em ▶ Play.' : R.lost ? 'a < −g: a pessoa perde contato com o piso.' : R.N > R.P + 1e-9 ? 'Aceleração para cima: N > P, sensação de mais peso.' : R.N < R.P - 1e-9 ? 'Aceleração para baixo: N < P, sensação de menos peso.' : 'Sem aceleração: N = P.', w * .5);
   }
 },
 {
@@ -1304,9 +1337,13 @@ const NEW = [
   },
   notes: 'Em série a associação fica mais "mole" (keq menor que a menor k); em paralelo, mais "dura" (keq maior). A mola puxa o corpo para cima e o corpo puxa a mola para baixo: par ação e reação.',
   enun: s => `${cap(btxt(s, 1))} de massa ${num(s.m1)} kg está em equilíbrio, pendurad${o(s, 1)} ${s.assoc === 'unica' ? `em uma mola de constante ${num(s.k1)} N/m` : `em duas molas associadas em ${s.assoc === 'serie' ? 'série' : 'paralelo'}, de constantes ${num(s.k1)} N/m e ${num(s.k2)} N/m`}. Considerando g = ${num(G)} m/s², determine a constante elástica equivalente e a deformação do sistema.`,
-  draw(ctx, w, h, s, R){
-    const cx = w * .42, top = 26, L0 = h * .2, ext = h * .3 * R.x / (R.x + .25), sz = fitS(s.b1, w * .18, h * .2);
-    hatchTop(ctx, cx - 80, cx + 80, top);
+  dur(){ return 7; },
+  ext(t){ return 1 - Math.exp(-.45 * t) * Math.cos(2 * Math.PI * .75 * t); },
+  live(s, R, an){ const f = this.ext(an.t); return `<span>x = <b>${fmt(R.x * f * 100, 2)}</b> cm</span><span>Fel = <b>${auto(R.F * f)}</b> N</span><span>P = <b>${auto(R.F)}</b> N</span>`; },
+  draw(ctx, w, h, s, R, an){
+    const cx = w * .5, top = 22, L0 = h * .18, sz = fitS(s.b1, w * .16, h * .17), hb = DIM[s.b1][1] * sz;
+    const extEq = (h - top - L0 - hb - 16) * .45 * Math.min(1, R.x / (R.x + .15) + .35), f = this.ext(an.t), ext = extEq * f;
+    hatchTop(ctx, cx - 50, cx + 50, top);
     let yb;
     if (s.assoc === 'serie'){
       const e1 = ext * R.x1 / R.x, e2 = ext * R.x2 / R.x, m = top + L0 / 2 + e1;
@@ -1320,13 +1357,16 @@ const NEW = [
       ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx, yb - 6); ctx.lineTo(cx, yb); ctx.stroke();
       hand(ctx, 'k₁', cx - 44, top + L0 / 2, C.muted, 'right', 'middle'); hand(ctx, 'k₂', cx + 44, top + L0 / 2, C.muted, 'left', 'middle');
     } else { yb = top + L0 + ext; spring(ctx, cx, top, yb, 10, 12); }
-    const hb = DIM[s.b1][1] * sz, b = drawBody(ctx, s.b1, cx, yb + hb, sz, C.bodyA);
-    const nat = top + L0;
-    dashLine(ctx, cx + 60, nat, cx + 130, nat); dashLine(ctx, cx + 60, yb, cx + 130, yb, C.brass);
-    arrow(ctx, cx + 110, nat, cx + 110, yb, C.brass, ''); hand(ctx, `x = ${auto(R.x * 100)} cm`, cx + 136, (nat + yb) / 2 + 6, C.brass);
-    hand(ctx, 'comprimento natural', cx + 136, nat + 6, C.muted, 'left', 'bottom', 13);
-    const L = Math.min(70, h * .18), cyb = yb + hb / 2;
-    arrow(ctx, cx - b.w / 2 - 14, cyb, cx - b.w / 2 - 14, cyb - L, C.apple, 'Fel'); arrow(ctx, cx + b.w / 2 + 14, cyb, cx + b.w / 2 + 14, Math.min(h - 6, cyb + L), C.weight, 'P');
+    const b = drawBody(ctx, s.b1, cx, yb + hb, sz, C.bodyA);
+    const nat = top + L0, eq = top + L0 + extEq;
+    dashLine(ctx, cx + 50, nat, cx + 100, nat); dashLine(ctx, cx + 50, eq, cx + 100, eq, C.brass);
+    arrow(ctx, cx + 84, nat, cx + 84, eq, C.brass, ''); hand(ctx, `x = ${auto(R.x * 100)} cm`, cx + 104, (nat + eq) / 2 + 6, C.brass);
+    hand(ctx, 'natural', cx + 104, nat + 6, C.muted, 'left', 'bottom', 13);
+    hand(ctx, 'equilíbrio', cx + 104, eq + 6, C.brass, 'left', 'bottom', 13);
+    const L = Math.min(60, h * .16), cyb = yb + hb / 2;
+    if (f > .02) arrow(ctx, cx - b.w / 2 - 14, cyb, cx - b.w / 2 - 14, cyb - L * f, C.apple, 'Fel');
+    arrow(ctx, cx + b.w / 2 + 14, cyb, cx + b.w / 2 + 14, Math.min(h - 6, cyb + L), C.weight, 'P');
+    caption(ctx, w, an.t === 0 ? 'Corpo preso no comprimento natural. Toque em ▶ Play para soltar.' : an.t < 5 ? 'Oscila em torno do equilíbrio, onde Fel = P.' : 'Equilíbrio: Fel = P (1ª Lei).', w * .5 - 74);
   }
 },
 {
@@ -1349,20 +1389,43 @@ const NEW = [
     + li('No ponto mais baixo (conservação de energia, desnível 2R):', [`v_b² = v² + 2·g·(2R) ⇒ v_b = ${auto(R.vb)} m/s`, `N − P = m·v_b²/R ⇒ N = ${auto(R.Nb)} N`]),
   notes: 'Abaixo da velocidade mínima, falta força para o centro e o corpo tende a seguir em linha reta (1ª Lei), descolando da pista.',
   enun: s => `${cap(btxt(s, 1))} de massa ${num(s.m1)} kg percorre um looping vertical de raio ${num(s.R)} m, passando pelo ponto mais alto com velocidade de ${num(s.v)} m/s. Desprezando atritos e considerando g = ${num(G)} m/s², determine a velocidade mínima no topo, a força normal no topo e a força normal no ponto mais baixo.`,
-  draw(ctx, w, h, s, R){
-    const cx = w * .45, cy = h * .52, r = Math.min(w, h) * .36;
+  sim(s, R){
+    const key = [s.m1, s.R, s.v, G].join('|'); if (this._k === key) return this._sim; this._k = key;
+    const Rr = s.R, pts = []; let phi = 0, t = 0, mode = 0, x, y, vx, vy;
+    const lap = 2 * Math.PI * Rr / Math.max(R.vb, 1e-6), dt = lap / 3000;
+    for (let i = 0; i < 20000; i++){
+      if (mode === 0){
+        const v2 = R.vb * R.vb - 2 * G * Rr * (1 - Math.cos(phi)), v = Math.sqrt(Math.max(v2, 0)), N = s.m1 * v2 / Rr + s.m1 * G * Math.cos(phi);
+        pts.push({t, x: Rr * Math.sin(phi), y: Rr * Math.cos(phi), phi, v, N, on: true});
+        if (phi >= 2 * Math.PI) break;
+        if (N < 0 || v < 1e-6){ mode = 1; x = Rr * Math.sin(phi); y = Rr * Math.cos(phi); vx = v * Math.cos(phi); vy = -v * Math.sin(phi); continue; }
+        phi += v / Rr * dt; t += dt;
+      } else {
+        vy += G * dt; x += vx * dt; y += vy * dt; t += dt;
+        pts.push({t, x, y, phi: Math.atan2(x, y), v: Math.hypot(vx, vy), N: 0, on: false});
+        if (Math.hypot(x, y) >= Rr * .97 || pts.length > 9000) break;
+      }
+    }
+    this._sim = {pts, T: t}; return this._sim;
+  },
+  dur(){ return 5; },
+  at(s, R, an){ const S = this.sim(s, R), tt = clamp(an.t / 5, 0, 1) * S.T; let lo = 0, hi = S.pts.length - 1; while (hi - lo > 1){ const m = (lo + hi) >> 1; if (S.pts[m].t <= tt) lo = m; else hi = m; } return S.pts[lo]; },
+  live(s, R, an){ const q = this.at(s, R, an); return `<span>altura = <b>${fmt(s.R - q.y, 2)}</b> m</span><span>v = <b>${fmt(q.v, 2)}</b> m/s</span><span>N = <b>${q.on ? auto(q.N) : '0'}</b> N</span>`; },
+  draw(ctx, w, h, s, R, an){
+    const cx = w * .45, cy = h * .52, r = Math.min(w, h) * .36, k = r / s.R;
     ctx.strokeStyle = C.ink; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
     ctx.fillStyle = C.ink; ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI * 2); ctx.fill(); hand(ctx, `R = ${num(s.R)} m`, cx + 8, cy - 4, C.muted);
-    const sz = fitS(s.b1, r * .5, r * .26), bh = DIM[s.b1][1] * sz, L = forceLen(h * .8, Math.max(R.P, R.Nb, Math.abs(R.Nt)));
-    ctx.save(); ctx.translate(cx, cy - r); ctx.rotate(Math.PI); drawBody(ctx, s.b1, 0, 0, sz, C.bodyA); ctx.restore();
-    const ct = cy - r + bh / 2;
-    arrow(ctx, cx - 8, ct, cx - 8, ct + L(R.P), C.weight, 'P');
-    if (!R.falls) arrow(ctx, cx + 8, ct, cx + 8, ct + L(R.Nt), C.sky, 'N');
-    arrow(ctx, cx, ct - bh / 2 - 4, cx - 50, ct - bh / 2 - 4, C.leaf, 'v');
-    ctx.globalAlpha = .55; drawBody(ctx, s.b1, cx, cy + r, sz, C.bodyA); ctx.globalAlpha = 1;
-    const cb = cy + r - bh / 2;
-    arrow(ctx, cx - 8, cb, cx - 8, cb + Math.min(L(R.P), 20), C.weight, ''); arrow(ctx, cx + 8, cb, cx + 8, cb - L(R.Nb), C.sky, 'N');
-    caption(ctx, w, R.falls ? 'Abaixo de v mínima: perde contato no topo.' : 'No topo, P e N apontam para o centro.', w * .45);
+    const q = this.at(s, R, an), px = cx + q.x * k, py = cy + q.y * k;
+    const sz = fitS(s.b1, r * .5, r * .3), bh = DIM[s.b1][1] * sz;
+    ctx.save(); ctx.translate(px, py); ctx.rotate(-q.phi); drawBody(ctx, s.b1, 0, 0, sz, C.bodyA); ctx.restore();
+    const inx = -Math.sin(q.phi), iny = -Math.cos(q.phi), c = {x: px + inx * bh / 2, y: py + iny * bh / 2};
+    const L = forceLen(h * .7, Math.max(R.P, R.Nb));
+    const ox = -iny * 7, oy = inx * 7;
+    arrow(ctx, c.x - ox, c.y - oy, c.x - ox, c.y - oy + L(R.P), C.weight, 'P');
+    if (q.on && q.N > 1e-9) arrow(ctx, c.x + ox, c.y + oy, c.x + ox + inx * L(q.N), c.y + oy + iny * L(q.N), C.sky, 'N');
+    const tx = Math.cos(q.phi), ty = -Math.sin(q.phi), kv = 50 / R.vb;
+    if (q.on && q.v > 1e-6) arrow(ctx, c.x, c.y, c.x + tx * q.v * kv, c.y + ty * q.v * kv, C.leaf, 'v');
+    caption(ctx, w, an.t === 0 ? 'Toque em ▶ Play: o corpo entra pelo ponto mais baixo.' : !q.on ? 'Perdeu contato: N chegou a zero antes do topo.' : 'N + componente do peso fazem a centrípeta.', w * .4);
   }
 },
 /* ---------- TRABALHO E ENERGIA (novos) ---------- */
@@ -1392,18 +1455,30 @@ const NEW = [
     + li('Teorema trabalho-energia (vem da 2ª Lei):', [`W_total = ΔEc ⇒ ${auto(R.Wt)} = Ec_f − ${auto(R.Ec0)}`, `Ec_f = ${auto(R.Ecf)} J ⇒ v = √(2·Ec_f / m) = ${R.stops ? '—' : auto(R.vf) + ' m/s'}`], R.stops ? 'Ec final negativa: o corpo para antes de completar o deslocamento.' : ''),
   notes: 'Trabalho positivo fornece energia ao corpo; trabalho negativo (atrito) retira. Força perpendicular ao movimento não realiza trabalho.',
   enun: s => `${cap(mtxt(s, 1))}, ${s.v0 > 0 ? `com velocidade inicial de ${num(s.v0)} m/s` : 'inicialmente em repouso'}, é puxad${o(s, 1)} por uma força de ${num(s.F)} N que forma ${num(s.ang)}° com a horizontal, ao longo de ${num(s.d)} m de um piso com coeficiente de atrito ${num(s.mu)}. Considerando g = ${num(G)} m/s², determine o trabalho de cada força, o trabalho total e a velocidade ao final do deslocamento.`,
-  draw(ctx, w, h, s, R){
-    const gy = h * .64, x = w * .34;
+  kin(s, R){
+    const a = (R.Fx - R.Fat) / s.m1, v0 = s.v0;
+    let T, D = s.d;
+    if (Math.abs(a) < 1e-12) T = v0 > 0 ? s.d / v0 : 0;
+    else { const disc = v0 * v0 + 2 * a * s.d; if (disc < 0){ T = -v0 / a; D = -v0 * v0 / (2 * a); } else T = (-v0 + Math.sqrt(disc)) / a; }
+    if (!(T > 0)){ T = 0; D = 0; }
+    return {a, T, D};
+  },
+  dur(s, R){ const K = this.kin(s, R); return K.T > 0 ? clamp(K.T, 2, 5) : 2; },
+  st(s, R, an){ const K = this.kin(s, R), tt = clamp(an.t / this.dur(s, R), 0, 1) * K.T; return {x: s.v0 * tt + K.a * tt * tt / 2, v: s.v0 + K.a * tt}; },
+  live(s, R, an){ const q = this.st(s, R, an); return `<span>x = <b>${fmt(q.x, 2)}</b> m</span><span>v = <b>${fmt(Math.max(0, q.v), 2)}</b> m/s</span><span>W_F = <b>${auto(R.Fx * q.x)}</b> J</span><span>W_at = <b>${auto(-R.Fat * q.x)}</b> J</span>`; },
+  draw(ctx, w, h, s, R, an){
+    const gy = h * .62, sz = fitS(s.b1, w * .18, h * .24), bw = DIM[s.b1][0] * sz, x0 = 16 + bw / 2;
+    const scale = (w - x0 - bw / 2 - 90) / Math.max(s.d, 1e-9), q = this.st(s, R, an), x = x0 + q.x * scale;
     floor(ctx, w, h, gy, s.mu > 0 ? C.brass : null, Math.min(.35, s.mu * .4));
-    const b = drawBody(ctx, s.b1, x, gy, fitS(s.b1, w * .22, h * .26), C.bodyA), cy = gy - b.h / 2;
-    const L = forceLen(h, Math.max(s.m1 * G, s.F));
+    ruler(ctx, w, h, gy, 0, scale, x0);
+    ctx.globalAlpha = .18; ctx.fillStyle = C.leaf; ctx.fillRect(x0, gy + 22, Math.max(0, q.x * scale), 6); ctx.globalAlpha = 1;
+    dashLine(ctx, x0 + s.d * scale, gy - h * .4, x0 + s.d * scale, gy, C.leaf); hand(ctx, `d = ${num(s.d)} m`, x0 + s.d * scale - 4, gy - h * .4 + 16, C.leaf, 'right');
+    const b = drawBody(ctx, s.b1, x, gy, sz, C.bodyA), cy = gy - b.h / 2, L = forceLen(h, Math.max(s.m1 * G, s.F));
     arrow(ctx, x, cy, x + Math.cos(R.th) * L(s.F), cy - Math.sin(R.th) * L(s.F), C.apple, 'F');
-    if (s.ang > 0){ ctx.strokeStyle = C.apple; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x, cy, 28, -R.th, 0); ctx.stroke(); hand(ctx, `${num(s.ang)}°`, x + 32, cy - 4, C.apple); dashLine(ctx, x, cy, x + 70, cy); }
-    arrow(ctx, x, cy, x, cy + L(s.m1 * G), C.weight, 'P'); arrow(ctx, x - 10, cy, x - 10, cy - L(R.N), C.sky, 'N');
+    if (s.ang > 0){ ctx.strokeStyle = C.apple; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x, cy, 26, -R.th, 0); ctx.stroke(); hand(ctx, `${num(s.ang)}°`, x + 30, cy - 4, C.apple); }
+    arrow(ctx, x - 6, cy, x - 6, cy + L(s.m1 * G), C.weight, 'P'); arrow(ctx, x + 6, cy, x + 6, cy - L(R.N), C.sky, 'N');
     if (R.Fat > 0) arrow(ctx, x - b.w / 2, gy - 5, x - b.w / 2 - L(R.Fat), gy - 5, C.brass, 'Fat');
-    arrow(ctx, x - b.w / 2, gy + 26, Math.min(w - 20, x + w * .45), gy + 26, C.leaf, '');
-    hand(ctx, `d = ${num(s.d)} m`, x, gy + 48, C.leaf, 'left', 'bottom');
-    caption(ctx, w, `W total = ${auto(R.Wt)} J`);
+    caption(ctx, w, an.t === 0 ? 'Toque em ▶ Play.' : `Trabalho realizado até aqui: ${auto((R.Fx - R.Fat) * q.x)} J`, w * .7);
   }
 },
 {
@@ -1473,7 +1548,7 @@ const NEW = [
     hspring(ctx, wx, springEnd, gy - Math.min(18, DIM[s.b1][1] * sz / 2), 9, 12);
     ctx.save(); ctx.translate(bx, by); ctx.rotate(rot); drawBody(ctx, s.b1, 0, 0, sz, C.bodyA); ctx.restore();
     if (!run) hand(ctx, `x = ${num(s.x)} m`, wx + (Ln - comp) / 2, gy + 22, C.muted, 'center');
-    caption(ctx, w, !run ? 'Mola comprimida. Toque em Simular.' : t < .4 ? 'Epel vira Ec.' : t < 1.4 ? `Sai com v = ${auto(R.v)} m/s.` : 'Ec vira Ep na rampa.', w * .55);
+    caption(ctx, w, !run ? 'Mola comprimida. Toque em ▶ Play.' : t < .4 ? 'Epel vira Ec.' : t < 1.4 ? `Sai com v = ${auto(R.v)} m/s.` : 'Ec vira Ep na rampa.', w * .55);
   }
 },
 {
@@ -1501,25 +1576,31 @@ const NEW = [
   },
   notes: 'Com atrito a energia mecânica não se conserva: a parte dissipada vira calor nas superfícies. A energia total continua conservada.',
   enun: s => `${cap(mtxt(s, 1))} é abandonad${o(s, 1)} no topo de uma rampa de ${num(s.hh)} m de altura, inclinada de ${num(s.ang)}°, com coeficiente de atrito ${num(s.mu)}. Considerando g = ${num(G)} m/s², determine a energia dissipada pelo atrito e a velocidade do corpo ao chegar à base da rampa.`,
-  draw(ctx, w, h, s, R){
+  ac(s, R){ return G * (Math.sin(R.th) - s.mu * Math.cos(R.th)); },
+  tdesc(s, R){ const a = this.ac(s, R); return R.slides && a > 0 ? Math.sqrt(2 * R.L / a) : 0; },
+  dur(s, R){ const T = this.tdesc(s, R); return T > 0 ? clamp(T, 1.8, 5) : 2; },
+  st(s, R, an){ const T = this.tdesc(s, R), tt = clamp(an.t / this.dur(s, R), 0, 1) * T, a = this.ac(s, R), x = a * tt * tt / 2; return {x, v: a * tt, f: R.L > 0 ? x / R.L : 0}; },
+  live(s, R, an){ const q = this.st(s, R, an), Ep = R.Ei * (1 - q.f), Wd = R.Fat * q.x, Ec = Math.max(0, R.Ei - Ep - Wd); return `<span>v = <b>${fmt(q.v, 2)}</b> m/s</span><span>Ep = <b>${auto(Ep)}</b> J</span><span>Ec = <b>${auto(Ec)}</b> J</span><span>dissipada = <b>${auto(Wd)}</b> J</span>`; },
+  draw(ctx, w, h, s, R, an){
     const gy = h * .88, thv = clamp(R.th, 10 * D2R, 60 * D2R);
     let Bw = w * .52, H = Bw * Math.tan(thv); if (H > h * .62){ H = h * .62; Bw = H / Math.tan(thv); }
     const xL = 20, A = {x: xL, y: gy - H}, Cc = {x: xL + Bw, y: gy};
     floor(ctx, w, h, gy);
     ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(xL, gy); ctx.lineTo(Cc.x, Cc.y); ctx.closePath(); ctx.fillStyle = C.ground; ctx.fill(); ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.stroke();
-    const len = Math.hypot(Bw, H), sz = fitS(s.b1, len * .22, h * .14);
-    const put = (f, alpha) => { const p = {x: A.x + Math.cos(thv) * len * f, y: A.y + Math.sin(thv) * len * f}; ctx.globalAlpha = alpha; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(thv); drawBody(ctx, s.b1, 0, 0, sz, C.bodyA); ctx.restore(); ctx.globalAlpha = 1; };
-    put(.14, .45); if (R.slides) put(.86, 1);
+    const len = Math.hypot(Bw, H), sz = fitS(s.b1, len * .22, h * .14), bw = DIM[s.b1][0] * sz, q = this.st(s, R, an);
+    const f0 = bw / 2 / len + .02, pf = f0 + (1 - 2 * f0) * q.f;
+    const p = {x: A.x + Math.cos(thv) * len * pf, y: A.y + Math.sin(thv) * len * pf};
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(thv); drawBody(ctx, s.b1, 0, 0, sz, C.bodyA); ctx.restore();
     hand(ctx, `h = ${num(s.hh)} m`, xL + 6, gy - H / 2, C.muted, 'left', 'middle');
-    if (R.slides){
-      const bx = w * .66, bw = Math.min(30, w * .06), base = gy, top = h * .2, kk = (base - top) / R.Ei;
-      [[R.Ei, C.ink, 'Em'], [R.Wd, C.apple, 'perdida'], [R.Ef, C.leaf, 'Ec final']].forEach(([v, col, nm], i) => {
-        const x = bx + i * (bw + 22), hh = Math.min(v, R.Ei) * kk;
-        ctx.globalAlpha = .7; ctx.fillStyle = col; ctx.fillRect(x, base - hh, bw, hh); ctx.globalAlpha = 1;
-        hand(ctx, nm, x + bw / 2, base - hh - 4, col, 'center', 'bottom', 13);
-      });
-    }
-    caption(ctx, w, R.slides ? `Dissipado: ${fmt(R.pct, 1)}% da energia.` : 'tg θ ≤ μ: o corpo não desliza.', w * .6);
+    const Ep = R.Ei * (1 - q.f), Wd = R.slides ? R.Fat * q.x : 0, Ec = Math.max(0, R.Ei - Ep - Wd);
+    const bx = w * .64, bwd = Math.min(28, w * .055), base = gy, top = h * .2, kk = (base - top) / R.Ei;
+    [[Ep, C.sky, 'Ep'], [Ec, C.leaf, 'Ec'], [Wd, C.apple, 'dissipada']].forEach(([v, col, nm], i) => {
+      const x = bx + i * (bwd + 24), hh = clamp(v, 0, R.Ei) * kk;
+      ctx.strokeStyle = C.rule; ctx.lineWidth = 1; ctx.strokeRect(x, top, bwd, base - top);
+      ctx.globalAlpha = .75; ctx.fillStyle = col; ctx.fillRect(x, base - hh, bwd, hh); ctx.globalAlpha = 1;
+      hand(ctx, nm, x + bwd / 2, top - 4, col, 'center', 'bottom', 13);
+    });
+    caption(ctx, w, an.t === 0 ? 'Toque em ▶ Play para soltar o corpo.' : R.slides ? `Ep vira Ec, e parte (${fmt(R.pct, 1)}%) vira calor.` : 'tg θ ≤ μ: o corpo não desliza.', w * .6);
   }
 }
 ];
@@ -1650,7 +1731,6 @@ $('solve').onclick = () => {
   sel.solved = true; $('solve').hidden = true;
   $('tTitle').textContent = cur.nome;
   $('tLaws').innerHTML = cur.leis.map(l => `<span class="law" title="${LAWS[l]}">${l}</span>`).join(' ');
-  $('animBtns').hidden = !cur.anim;
   reveal($('s5'), true);
   st.fit(); recalc();
 };
@@ -1695,7 +1775,12 @@ const st = {w: 0, h: 0, fit(){
 }};
 window.addEventListener('resize', () => { if (sel.solved) st.fit(); });
 
-$('go').onclick = () => { if (R && !R.err) anim = {t: 0, run: true}; };
+$('go').onclick = () => {
+  if (!R || R.err) return;
+  const D = cur.dur(getState(cur), R);
+  if (anim.run) anim.run = false;
+  else { if (anim.t >= D - 1e-9) anim.t = 0; anim.run = true; }
+};
 $('rs').onclick = () => { anim = {t: 0, run: false}; };
 $('copy').onclick = () => {
   const txt = $('enun').textContent; if (!txt || !navigator.clipboard) return;
@@ -1726,6 +1811,8 @@ function loop(now){
     else if (R){
       if (anim.run){ anim.t += dt; const D = T.dur(s, R); if (anim.t >= D){ anim.t = D; anim.run = false; } }
       T.draw(ctx, st.w, st.h, s, R, anim);
+      const lbl = anim.run ? '❚❚ Pausar' : (anim.t >= T.dur(s, R) - 1e-9 && anim.t > 0) ? '↺ Repetir' : anim.t > 0 ? '▶ Continuar' : '▶ Play';
+      if ($('go').textContent !== lbl) $('go').textContent = lbl;
       if (T.live){ $('live').hidden = false; $('live').innerHTML = T.live(s, R, anim); } else $('live').hidden = true;
     }
     ctx.shadowBlur = 0;
@@ -1753,10 +1840,7 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { dr
   $('ghost').innerHTML = h;
 })();
 
-window.__newtonar = {TOPICS, getState, BODIES, ORDER, chooseArea, chooseTopic, sel, ctx, st, get R(){ return R; }};
 })();
 </script>
 </body>
 </html>
-
-</body></html>

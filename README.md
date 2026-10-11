@@ -20,7 +20,7 @@ Cada assunto indica quais Leis de Newton estão envolvidas.
 2. **Qual situação?** Escolha o assunto.
 3. **Escolha o corpo.** Bloco, partícula, esfera, carro, pessoa, vagão, caminhão, projétil ou canhão.
 4. **Dados do problema.** Ajuste os valores (aceita vírgula decimal).
-5. **Resolver no quadro.** Simulação, resultados, passo a passo e enunciado gerado.
+5. **Resolver no quadro.** Simulação animada (▶ Play, pausar e repetir), resultados, passo a passo e enunciado gerado.
 
 ## Assuntos
 
@@ -59,7 +59,8 @@ Cada assunto indica quais Leis de Newton estão envolvidas.
 ## Recursos
 
 - Quadro negro ou quadro branco (a escolha fica salva no navegador)
-- g = 9,81 m/s² ou g = 10 m/s²
+- Escolha de g dentro de cada exercício que usa gravidade: 9,81 m/s², 10 m/s² ou outro valor digitado (Lua, Marte...)
+- Todos os assuntos com animação do movimento e valores ao vivo (tempo, velocidade, forças, energias)
 - Massa típica preenchida automaticamente para cada corpo
 - Enunciado gerado com botão de copiar
 - Funciona no computador e no celular
